@@ -1,0 +1,186 @@
+
+PROJECT DOCUMENTATION
+1. Project Title:
+📘 AGRISMART FARMERS SYSTEM –
+MERN Stack Web Application
+
+2. Developer
+Phillip kimonyi, student plp, 2025 cohort
+
+3. Abstract
+
+The Smart Farmers System is a MERN (MongoDB, Express.js, React.js, Node.js) full-stack application that connects farmers and buyers, allowing farmers to upload agricultural products and buyers to browse and purchase them. The project implements user roles (Admin, Farmer, Buyer), authentication using Clerk, and dynamic product aggregation with secure backend APIs.
+The system was designed following the Software Development Life Cycle (SDLC) including planning, analysis, design, development, testing, deployment, and maintenance.
+The project demonstrates clean architecture, modern UI, and real-world system modularity.
+
+4. Introduction
+Agriculture is one of the biggest sectors in Kenya. However, lack of market linkage between farmers and buyers leads to wastage, losses, and inefficiency.
+The Smart Farmers System solves this by providing an online marketplace for farmers and buyers.
+
+The system is:
+
+Fast
+Fully authenticated
+Role-based
+Secure with protected routes
+Deployable and scalable
+5. System Overview / Methodology (SDLC)
+5.1 Planning
+We defined:
+Users: Admin, Farmers, Buyers
+Need: A digital marketplace
+Core features:
+⦁	User authentication (Clerk)
+⦁	Product uploading (farmer)
+⦁	Product browsing (buyer)
+⦁	Admin management
+
+Product categories
+Dashboards
+CRUD operations
+Deployment plan: Cloud (vercel + Render)
+5.2 System Analysis
+User Requirements
+Farmers
+1.	Add, edit, delete products
+2.	View own dashboard
+
+Buyers
+1.	Browse categories
+2.	View products
+3.	Add to cart (optional future feature)
+Admin
+1.	Manage all users
+2.	Manage all products
+High-level overview
+
+Technical Requirements
+⦁	MERN stack
+⦁	REST APIs
+⦁	Clerk authentication
+⦁	MongoDB role assignment
+⦁	React Router for navigation
+⦁	Responsive UI
+
+5.3 System Design
+5.3.1 Architecture Diagram
+
+Frontend: React (components, routes, context)
+Backend: Node.js + Express.js
+Database: MongoDB
+Auth: Clerk.com
+Cloud Storage: Unsplash links for product thumbnails(to update upload from local device)
+
+5.3.2 ER Diagram
+
+Entities:
+User
+Product
+Category
+Relationships:
+
+User (1) → Products (Many)
+Category (1) → Products (Many)
+5.3.3 API Design
+
+Endpoints:
+POST /api/products
+GET /api/products
+GET /api/products/:id
+PUT /api/products/:id
+DELETE /api/products/:id
+
+6. Components
+Backend
+i.	Express server
+ii.	Mongoose models
+iii.	Product routes
+iv.	User role middleware
+v.	Admin authorization
+
+Frontend
+i.	React components
+ii.	Product UI cards
+iii.	Login, Signup, Dashboard pages
+iv.	Navbar, Footer
+v.	Category pages
+vi.	Admin dashboard
+vii.	Authentication
+viii.	Clerk
+
+Role stored in MongoDB metadata collection
+
+Protected routes using Clerk + custom middleware
+
+7. Project Design
+7.1 UI/UX
+Designed in Figma → Implemented in React
+Clean grey theme
+Simple navigation
+Consistent spacing
+Card-based product grid
+
+7.2 System Flowchart
+
+
+
+8. Functional Code Summary
+8.1 Models
+Product Model
+⦁	name
+⦁	category
+⦁	price
+⦁	description
+⦁	image
+⦁	ownerId
+⦁	createdAt
+
+8.2 Controllers
+⦁	addProduct()
+⦁	getAllProducts()
+⦁	updateProduct()
+⦁	deleteProduct()
+⦁	getProductByCategory()
+
+8.3 Frontend Code
+⦁	React Router for pages
+⦁	Axios for backend requests
+⦁	Clerk components for login/signup
+⦁	Conditional rendering for dashboards
+
+9. How The System Works
+1. User Signup/Login through Clerk
+2. Clerk assigns user ID
+3. MongoDB stores role (admin/farmer/buyer)
+4. Farmer uploads product
+5. Product saved in MongoDB
+6. Buyer views categories
+7. Buyer selects and views products
+8. Admin monitors all activity
+10. Results & Observations
+
+✔ System works smoothly
+✔ Admin role validated using MongoDB role field
+✔ Products displayed correctly by category
+✔ UI clean and responsive
+✔ Clerk authentication stable after metadata fix
+
+11. Challenges Faced
+
+Clerk metadata not updating → solved by storing role in MongoDB
+CORS issues during deployment
+Routing issues on vercel and render
+Image hosting → solved using Unsplash links
+Maintaining admin-only route security
+
+12. Conclusion
+
+The Smart Farmers System successfully demonstrates:
+Full MERN development
+Authentication and authorization
+Database modeling
+REST API creation
+SDLC-based project execution
+Clean UI/UX principles
+
+This project has been deployed and is up and running deployable and scalable, and serves as a strong portfolio example for real-world full-stack development.
