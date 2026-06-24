@@ -1,0 +1,58 @@
+ FIGMA PROMPTS — AgriNexus Complete Platform
+
+1️⃣ LANDING PAGE
+
+"Design a modern agricultural platform landing page called AgriNexus with tagline 'From Farm to Market, Digitally'. Dark green and amber/gold color palette with white backgrounds. Hero section with a split layout — left side has headline, subheadline, and two CTA buttons ('I'm a Farmer' and 'I'm a Buyer'), right side has a hero illustration of a farmer with a tablet on a farm. Below hero: 3 feature highlight cards — Marketplace, Smart Farm IoT, AI Market Intelligence. Then a 'How it Works' 3-step section. Footer with links. Mobile responsive."
+
+
+2️⃣ FARMER DASHBOARD (Main Hub)
+
+"Design a comprehensive farmer dashboard for AgriNexus web app. Left sidebar navigation with icons and labels: Overview, My Products, Orders, IoT Farm Monitor, Weather Forecast, AI Market Analysis, Settings, Logout. Top navbar with farmer profile avatar and notification bell. Main area has: 4 stat cards (Total Products, Active Orders, Revenue This Month, Farm Health Score). Below stats: two columns — left shows Recent Orders table, right shows a mini weather widget with today's forecast. Green and white theme, card-based modern UI, data-rich layout."
+
+
+3️⃣ BUYER DASHBOARD
+
+"Design a buyer dashboard for an agricultural marketplace called AgriNexus. Left sidebar with: Overview, Browse Products, My Orders, Saved Farmers, Notifications, Settings. Top navbar with search bar, cart icon with badge, and profile avatar. Main area shows: 3 stat cards (Orders Placed, Pending Deliveries, Total Spent). Below: Featured Products grid with crop photo cards showing product name, farmer name, price per kg, rating stars, and Add to Cart button. Filter bar at top of products section with category, location, and price range filters. Green and earthy tones."
+
+
+4️⃣ IOT FARM MONITOR DASHBOARD
+
+"Design an IoT farm monitoring dashboard page for a farmer in AgriNexus web app. Page title 'Farm Monitor — Kiambu Farm'. Top row has 4 large gauge/metric cards: Temperature (°C) with thermometer icon, Humidity (%) with droplet icon, Soil Moisture (%) with soil icon, Light Level (lux) with sun icon. Each card has a colored status badge (Optimal / Warning / Critical). Middle section has a real-time line chart showing all 4 sensor readings over the last 24 hours with a legend. Bottom section has a table of recent sensor readings with timestamps. Right sidebar has an Alerts panel showing triggered warnings. Green and dark teal color scheme, techy and modern feel."
+
+
+5️⃣ WEATHER FORECASTING PAGE
+
+"Design a weather forecasting page for farmers inside AgriNexus web app. Top section shows current weather for the farmer's location — large temperature display, weather condition icon (sunny/cloudy/rainy), wind speed, humidity, UV index. Below: a 7-day forecast strip with day, weather icon, high/low temp for each day. Third section: 'Farming Advisory' cards — 3 cards with AI-generated tips based on weather eg 'Good day for irrigation', 'Risk of frost — protect crops', 'Ideal planting conditions'. Bottom: hourly forecast bar chart. Clean sky-blue and green color palette, card-based layout."
+
+
+6️⃣ AI MARKET ANALYSIS PAGE
+
+"Design an AI market analysis dashboard page for farmers in AgriNexus. Page title 'AI Market Intelligence'. Top row: 3 insight cards showing — Best Crop to Sell This Week, Predicted Price Trend (up/down arrow), Demand Hotspot (location). Middle section left: a line chart showing price trends for selected crops over past 3 months with crop selector dropdown. Middle section right: a bar chart comparing demand levels across 5 crops. Bottom section: 'AI Recommendations' panel — a card styled like a chat bubble from an AI assistant showing 3 bullet recommendations eg 'Tomato prices expected to rise 15% in 2 weeks'. Dark green and gold/amber accent theme, professional and data-driven look."
+
+
+7️⃣ PRODUCT LISTING PAGE (Buyer)
+
+"Design a product browsing page for buyers in AgriNexus marketplace. Top filter bar with: search input, category dropdown, county/location dropdown, price range slider, sort by dropdown. Below: responsive product grid — each card has crop photo, product name badge, farmer name with small avatar, price per unit, quantity available, star rating, and 'Add to Cart' button. Left sidebar has advanced filter panel: checkboxes for categories (Vegetables, Fruits, Grains, Dairy), delivery options, organic badge filter. Pagination at bottom. Clean white and green marketplace feel."
+
+
+8️⃣ FARMER PRODUCT MANAGEMENT PAGE
+
+"Design a product management page for a farmer in AgriNexus. Top has 'My Products' title and a green 'Add New Product' button. Below: a table/grid of the farmer's listed products — each row/card shows product thumbnail, name, category, price, quantity, status (Active/Out of Stock), and action buttons (Edit, Delete). Above table: filter tabs (All, Active, Out of Stock, Pending). Clicking 'Add New Product' opens a modal/form with fields: Product Name, Category, Price per unit, Quantity, Unit type, Description, Upload Image. Clean, admin-panel style with green accents."
+
+
+9️⃣ ORDER MANAGEMENT PAGE (Both)
+
+"Design an order management page for AgriNexus platform used by both farmers and buyers. Page shows an orders table with columns: Order ID, Product, Buyer/Farmer Name, Quantity, Total Price, Date, Status (badge: Pending/Confirmed/Delivered/Cancelled), Actions. Top has filter tabs by status. Clicking an order opens a side panel with full order details, delivery address, and a status update dropdown for farmers. Clean white table layout with colored status badges, green accent buttons."
+
+
+🔟 REGISTRATION / LOGIN PAGE
+
+"Design a clean registration and login page for AgriNexus agricultural platform. Split screen layout — left side has a green background with AgriNexus logo, tagline 'From Farm to Market, Digitally', and a farm landscape illustration. Right side has the auth form. Login form: email, password, login button, forgot password link, sign up link. Register form: full name, email, password, confirm password, role selector (Farmer / Buyer) as two toggle cards with icons, register button. Minimal, professional, green and white."
+
+
+🛠️ How to Use These in Figma
+
+Open Figma → New File
+Install plugin: Figma AI or Galileo AI or Magician
+Paste each prompt into the AI design tool
+Generate → adjust colors to match: #2D6A4F (dark green), #F4A261 (amber), #FFFFFF
