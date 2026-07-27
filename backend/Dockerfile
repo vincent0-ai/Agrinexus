@@ -10,13 +10,13 @@ RUN a2enmod rewrite
 WORKDIR /var/www/html
 
 # Copy application files
-COPY . /var/www/html/
+COPY . .
 
 # Ensure uploads & logs directories exist with correct permissions
-RUN mkdir -p /var/www/html/uploads /var/www/html/logs \
+RUN mkdir -p uploads logs \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
-    && chmod -R 777 /var/www/html/uploads /var/www/html/logs
+    && chmod -R 777 uploads logs
 
 EXPOSE 80
 

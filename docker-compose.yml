@@ -5,16 +5,16 @@ services:
     container_name: agrinexus_db
     restart: always
     environment:
-      MYSQL_DATABASE: agrinexus_db
-      MYSQL_USER: agrinexus
-      MYSQL_PASSWORD: agrinexus_secret_password
-      MYSQL_ROOT_PASSWORD: agrinexus_root_password
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-agrinexus_db}
+      MYSQL_USER: ${MYSQL_USER:-agrinexus}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-agrinexus_secret_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-agrinexus_root_password}
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pagrinexus_root_password"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-agrinexus_root_password}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -28,14 +28,14 @@ services:
     restart: always
     environment:
       DB_HOST: db
-      DB_NAME: agrinexus_db
-      DB_USER: agrinexus
-      DB_PASS: agrinexus_secret_password
+      DB_NAME: ${MYSQL_DATABASE:-agrinexus_db}
+      DB_USER: ${MYSQL_USER:-agrinexus}
+      DB_PASS: ${MYSQL_PASSWORD:-agrinexus_secret_password}
       DB_CHARSET: utf8mb4
-      JWT_SECRET: super_secret_key_change_me_in_prod
-      WEATHER_API_KEY: ""
-      GEMINI_API_KEY: ""
-      DEEPSEEK_API_KEY: ""
+      JWT_SECRET: ${JWT_SECRET:-super_secret_key_change_me_in_prod}
+      WEATHER_API_KEY: ${WEATHER_API_KEY:-""}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-""}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-""}
     ports:
       - "8000:80"
     volumes:
@@ -50,7 +50,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_API_BASE_URL: http://localhost:8000
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
     container_name: agrinexus_frontend
     restart: always
     ports:
