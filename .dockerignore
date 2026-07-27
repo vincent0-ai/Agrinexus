@@ -1,0 +1,10 @@
+.git
+.gitignore
+.vscode
+.idea
+documentation
+README.md
+frontend/node_modules
+frontend/dist
+backend/logs/*
+!backend/logs/.gitkeep

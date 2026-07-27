@@ -4,7 +4,7 @@ export const GEMINI_BLUE = "#4285F4";
 export const DEEPSEEK_PURPLE = "#7C3AED";
 
 export const USE_MOCK = false; // set false to hit live PHP API
-export const API_BASE_URL = "http://localhost:8000";
+export const API_BASE_URL = (import.meta.env && import.meta.env.VITE_API_BASE_URL) || "http://localhost:8000";
 
 export const FARMER_NAV = [
   { id: "farmer-dashboard",    label: "Overview",           iconName: "LayoutDashboard" },
