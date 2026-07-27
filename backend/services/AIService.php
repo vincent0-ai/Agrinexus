@@ -2,7 +2,9 @@
 // backend/services/AIService.php
 // Unified AI chat service — supports Google Gemini & DeepSeek with agricultural prompts
 
-require_once __DIR__ . '/../config/env.php';
+if (file_exists(__DIR__ . '/../config/env.php')) {
+    require_once __DIR__ . '/../config/env.php';
+}
 
 class AIService {
 

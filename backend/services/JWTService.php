@@ -2,7 +2,9 @@
 // agrinexus-api/services/JWTService.php
 // Lightweight JWT implementation (no external library required)
 
-require_once __DIR__ . '/../config/env.php';
+if (file_exists(__DIR__ . '/../config/env.php')) {
+    require_once __DIR__ . '/../config/env.php';
+}
 
 class JWTService {
     public static function generate(array $payload): string {
