@@ -18,6 +18,7 @@ logs
 *.seed
 *.sqlite
 *.swp
+backend/config/env.php
 
 # ======================================================
 # 💻 FRONTEND BUILDS (React / Next / Vite)
