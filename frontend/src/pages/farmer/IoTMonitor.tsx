@@ -5,13 +5,18 @@ import { SensorLineChart } from "@/components/charts/SensorLineChart";
 import { iotMetrics, iotAlerts, iotData } from "@/data/iotData";
 import { cn } from "@/utils/cn";
 
+import { useAuth } from "@/context/AuthContext";
+
 const METRIC_ICONS: Record<string, React.ElementType> = {
   "Temperature": Thermometer, "Humidity": Droplets, "Soil Moisture": Activity, "Light Level": Sun,
 };
 
 export function IoTMonitor() {
+  const { user } = useAuth();
+  const countyName = user?.county ? `${user.county} Farm` : "Kiambu Farm";
+
   return (
-    <DashboardLayout title="Farm Monitor — Kiambu Farm">
+    <DashboardLayout title={`Farm Monitor — ${countyName}`}>
       <div className="space-y-5">
         {/* Metric cards */}
         <div className="grid grid-cols-4 gap-4">

@@ -123,7 +123,7 @@
 import { useState } from "react";
 import { Leaf, ShoppingBag } from "lucide-react";
 import { cn } from "@/utils/cn";
-import { GREEN } from "@/utils/constants";
+import { GREEN, KENYAN_COUNTIES } from "@/utils/constants";
 import { useAuth } from "@/context/AuthContext";
 
 export function AuthPage() {
@@ -142,7 +142,7 @@ export function AuthPage() {
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
   const [regConfirm, setRegConfirm] = useState("");
-  const [county, setCounty] = useState("");
+  const [county, setCounty] = useState("Kiambu");
 
   const handleLogin = async () => {
     setError("");
@@ -306,14 +306,16 @@ export function AuthPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-foreground mb-1.5">County</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Nairobi, Nakuru, Kisumu"
+                <label className="block text-sm font-bold text-foreground mb-1.5">County *</label>
+                <select
                   value={county}
                   onChange={e => setCounty(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none"
-                />
+                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none cursor-pointer"
+                >
+                  {KENYAN_COUNTIES.map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

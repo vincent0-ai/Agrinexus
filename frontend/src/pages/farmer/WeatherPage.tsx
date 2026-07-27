@@ -9,10 +9,13 @@ import { ChatFAB } from "@/components/ai/ChatFAB";
 import { Droplets, AlertTriangle, Leaf } from "lucide-react";
 import { useWeather } from "@/hooks/useWeather";
 
+import { useAuth } from "@/context/AuthContext";
+
 const ICONS: Record<string, any> = { good: Leaf, warning: AlertTriangle };
 
 export function WeatherPage() {
   const { advisories, loading } = useWeather();
+  const { user } = useAuth();
 
   return (
     <DashboardLayout title="Weather Forecast">
@@ -27,7 +30,7 @@ export function WeatherPage() {
         </div>
 
         {/* AI Weather Prediction */}
-        <WeatherPredictionCard />
+        <WeatherPredictionCard county={user?.county} />
 
         <div>
           <h2 className="font-bold text-foreground mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
