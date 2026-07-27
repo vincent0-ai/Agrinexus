@@ -5,7 +5,11 @@ function getToken() {
 }
 
 async function request(method: string, path: string, body?: unknown) {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
+  const cleanBase = API_BASE_URL.replace(/\/+$/, "");
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  const url = `${cleanBase}${cleanPath}`;
+
+  const res = await fetch(url, {
     method,
     headers: {
       "Content-Type": "application/json",
