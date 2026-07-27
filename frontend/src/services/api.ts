@@ -28,7 +28,7 @@ async function request(method: string, path: string, body?: unknown) {
     }
   }
 
-  if (!res.ok) throw new Error(data.message ?? `Request failed with status ${res.status}`);
+  if (!res.ok) throw new Error(data.message ?? data.error ?? `Request failed with status ${res.status}`);
   return data;
 }
 

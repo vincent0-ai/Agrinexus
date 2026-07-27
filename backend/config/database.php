@@ -1,12 +1,35 @@
 <?php
 // agrinexus-api/config/database.php
-// PDO connection for XAMPP — adjust credentials as needed
 
 define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
 define('DB_NAME', getenv('DB_NAME') ?: 'agrinexus_db');
 define('DB_USER', getenv('DB_USER') ?: 'root');
 define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : '');
 define('DB_CHARSET', getenv('DB_CHARSET') ?: 'utf8mb4');
+
+function autoInitDatabase(PDO $pdo): void {
+    static $checked = false;
+    if ($checked) return;
+    $checked = true;
+
+    try {
+        $result = $pdo->query("SHOW TABLES LIKE 'users'");
+        if ($result && $result->rowCount() === 0) {
+            $schemaFile = __DIR__ . '/../database/schema.sql';
+            if (file_exists($schemaFile)) {
+                $sql = file_get_contents($schemaFile);
+                $pdo->exec($sql);
+            }
+            $seedFile = __DIR__ . '/../database/seed.sql';
+            if (file_exists($seedFile)) {
+                $seedSql = file_get_contents($seedFile);
+                @$pdo->exec($seedSql);
+            }
+        }
+    } catch (Throwable $t) {
+        // Silently log or ignore if check fails
+    }
+}
 
 function getDB(): PDO {
     static $pdo = null;
@@ -22,9 +45,14 @@ function getDB(): PDO {
         ];
         try {
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+            autoInitDatabase($pdo);
         } catch (PDOException $e) {
             http_response_code(500);
-            die(json_encode(['error' => 'Database connection failed']));
+            header('Content-Type: application/json');
+            die(json_encode([
+                'success' => false,
+                'message' => 'Database connection failed: ' . $e->getMessage()
+            ]));
         }
     }
     return $pdo;
