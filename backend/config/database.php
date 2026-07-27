@@ -18,16 +18,30 @@ function autoInitDatabase(PDO $pdo): void {
             $schemaFile = __DIR__ . '/../database/schema.sql';
             if (file_exists($schemaFile)) {
                 $sql = file_get_contents($schemaFile);
-                $pdo->exec($sql);
+                $statements = array_filter(array_map('trim', explode(';', $sql)));
+                foreach ($statements as $stmt) {
+                    if (!empty($stmt)) {
+                        $pdo->exec($stmt);
+                    }
+                }
             }
             $seedFile = __DIR__ . '/../database/seed.sql';
             if (file_exists($seedFile)) {
                 $seedSql = file_get_contents($seedFile);
-                @$pdo->exec($seedSql);
+                $seedStatements = array_filter(array_map('trim', explode(';', $seedSql)));
+                foreach ($seedStatements as $stmt) {
+                    if (!empty($stmt)) {
+                        try {
+                            $pdo->exec($stmt);
+                        } catch (Throwable $st) {
+                            // ignore duplicate seed key errors
+                        }
+                    }
+                }
             }
         }
     } catch (Throwable $t) {
-        // Silently log or ignore if check fails
+        error_log("Database autoInit error: " . $t->getMessage());
     }
 }
 
