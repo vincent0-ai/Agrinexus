@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X, Package } from "lucide-react";
-import { GREEN } from "@/utils/constants";
+import { API_BASE_URL, GREEN } from "@/utils/constants";
 
 interface AddProductModalProps {
   onClose: () => void;
@@ -45,7 +45,8 @@ export function AddProductModal({ onClose, onSubmit }: AddProductModalProps) {
         formData.append("image", image);
 
         const token = localStorage.getItem("agrinexus_token") ?? "";
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/products`, {
+        const cleanBase = API_BASE_URL.replace(/\/+$/, "");
+        const res = await fetch(`${cleanBase}/products`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: formData,

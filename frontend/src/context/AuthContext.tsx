@@ -51,21 +51,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // On app load, restore user from token
   useEffect(() => {
     if (token) {
-      fetch(`${API_BASE_URL}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then(res => {
-        if (res.success && res.data) {
-          setUser(res.data);
-          setRole(res.data.role as "farmer" | "buyer");
-          setPage(res.data.role === 'farmer' ? 'farmer-dashboard' : 'buyer-dashboard');
-        } else {
-          localStorage.removeItem(TOKEN_KEY);
-          setToken(null);
-          setRole(null);
-          setPage('landing');
-        }
-      })
+      api.get('/auth/me')
+        .then(res => {
+          if (res.success && res.data) {
+            setUser(res.data);
+            setRole(res.data.role as "farmer" | "buyer");
+            setPage(res.data.role === 'farmer' ? 'farmer-dashboard' : 'buyer-dashboard');
+          } else {
+            localStorage.removeItem(TOKEN_KEY);
+            setToken(null);
+            setRole(null);
+            setPage('landing');
+          }
+        })
         .catch(() => {
           localStorage.removeItem(TOKEN_KEY);
           setToken(null);
