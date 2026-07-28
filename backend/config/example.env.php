@@ -4,8 +4,7 @@
 define('JWT_SECRET', 'super_secret_key_123');
 define('JWT_EXPIRES_IN', 86400); // 1 day
 
-define('WEATHER_API_KEY', ''); // left empty to use mock
-define('WEATHER_BASE_URL', 'https://api.openweathermap.org/data/2.5');
+// Weather API: Open-Meteo API is integrated (No API key required)
 
 // AI Provider API Keys (leave empty to use mock responses)
 define('GEMINI_API_KEY', '');

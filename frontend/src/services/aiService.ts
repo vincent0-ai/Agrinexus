@@ -2,7 +2,7 @@ import { api } from "./api";
 import { USE_MOCK } from "@/utils/constants";
 import { mockChatResponse, mockWeatherPrediction, mockMarketAnalysis, mockProviders } from "@/data/aiData";
 
-export type AIProvider = "gemini" | "deepseek";
+export type AIProvider = "auto";
 export type AIContext = "market" | "weather" | "general";
 
 export interface ChatMessage {
@@ -19,7 +19,7 @@ export interface ChatResponse {
 }
 
 export interface ProviderInfo {
-  id: AIProvider;
+  id: string;
   name: string;
   model: string;
   available: boolean;
@@ -44,9 +44,9 @@ export interface MarketAnalysis {
 }
 
 export async function sendChatMessage(
-  provider: AIProvider,
-  context: AIContext,
-  message: string,
+  provider: AIProvider = "auto",
+  context: AIContext = "general",
+  message: string = "",
   history: ChatMessage[] = []
 ): Promise<ChatResponse> {
   if (USE_MOCK) return mockChatResponse(provider, context, message);

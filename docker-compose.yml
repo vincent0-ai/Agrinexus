@@ -35,7 +35,6 @@ services:
       DB_PASS: ${MYSQL_PASSWORD:-agrinexus_secret_password}
       DB_CHARSET: utf8mb4
       JWT_SECRET: ${JWT_SECRET:-super_secret_key_change_me_in_prod}
-      WEATHER_API_KEY: ${WEATHER_API_KEY:-""}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-""}
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-""}
     expose:

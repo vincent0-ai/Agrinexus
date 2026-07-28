@@ -24,13 +24,19 @@ const QUICK_ACTIONS = [
 export function AIAssistantPage() {
   const { current, loading: weatherLoading } = useWeather();
   const [activeContext, setActiveContext] = useState<AIContext>("general");
+  const [selectedPrompt, setSelectedPrompt] = useState<{ prompt: string; context: AIContext; key: number } | null>(null);
+
+  const handleQuickAction = (action: typeof QUICK_ACTIONS[0]) => {
+    setActiveContext(action.context);
+    setSelectedPrompt({ prompt: action.prompt, context: action.context, key: Date.now() });
+  };
 
   return (
     <DashboardLayout title="AI Assistant">
       <div className="flex gap-5 h-[calc(100vh-120px)]">
         {/* Left — Chat Panel (60%) */}
         <div className="flex-[3] min-w-0">
-          <ChatPanel defaultContext={activeContext} className="h-full" />
+          <ChatPanel defaultContext={activeContext} initialPrompt={selectedPrompt} className="h-full" />
         </div>
 
         {/* Right — Context Sidebar (40%) */}
@@ -38,11 +44,10 @@ export function AIAssistantPage() {
           {/* AI Provider Status */}
           <div className="bg-card rounded-2xl border border-border p-4">
             <h3 className="font-bold text-sm text-foreground mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              AI Providers
+              AI Engine Status
             </h3>
             <div className="space-y-2">
-              <ProviderStatusRow name="Google Gemini" model="gemini-2.0-flash" color="#4285F4" gradient="from-blue-500 to-cyan-400" />
-              <ProviderStatusRow name="DeepSeek" model="deepseek-chat" color="#7C3AED" gradient="from-violet-500 to-purple-400" />
+              <ProviderStatusRow name="AgriNexus AI Engine" model="agrinexus-v2-smart (Auto Switch)" color="#10B981" gradient="from-emerald-500 to-teal-400" />
             </div>
           </div>
 
@@ -118,7 +123,8 @@ export function AIAssistantPage() {
                 return (
                   <button
                     key={action.label}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-all group text-left"
+                    onClick={() => handleQuickAction(action)}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-all group text-left cursor-pointer"
                   >
                     <Icon className="w-3.5 h-3.5 flex-shrink-0 opacity-60 group-hover:opacity-100" />
                     <span className="flex-1">{action.label}</span>

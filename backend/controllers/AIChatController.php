@@ -20,19 +20,13 @@ class AIChatController {
         $user    = User::find($payload['user_id']);
         $body    = json_decode(file_get_contents('php://input'), true);
 
-        $provider = $body['provider'] ?? 'gemini';
+        $provider = $body['provider'] ?? 'auto';
         $context  = $body['context']  ?? 'general';
         $message  = trim($body['message'] ?? '');
         $history  = $body['history']  ?? [];
 
         if (empty($message)) {
             Response::error('Message is required', 400);
-            return;
-        }
-
-        // Validate provider
-        if (!in_array($provider, ['gemini', 'deepseek'])) {
-            Response::error('Invalid provider. Use "gemini" or "deepseek"', 400);
             return;
         }
 
