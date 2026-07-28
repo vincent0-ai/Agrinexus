@@ -222,7 +222,7 @@ PROMPT,
     // ── Provider Implementations ──────────────────────────────────────────────
 
     private static function callGemini(string $systemPrompt, string $message, array $history): array {
-        $url = GEMINI_BASE_URL . '/models/gemini-2.0-flash:generateContent?key=' . GEMINI_API_KEY;
+        $url = GEMINI_BASE_URL . '/models/gemini-2.5-flash:generateContent?key=' . GEMINI_API_KEY;
 
         $payload = [
             'system_instruction' => [

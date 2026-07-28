@@ -213,22 +213,31 @@ class WeatherAPIService {
 
     // ── Cache helpers ──────────────────────────────────────────────────────
     private static function getCache(string $county, string $type): array|false {
-        $db  = getDB();
-        $sql = "SELECT data_json, fetched_at FROM weather_cache WHERE county = ? AND cache_key = ? LIMIT 1";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([$county, $type]);
-        $result = $stmt->fetch();
-        if (!$result) return false;
-        $age = (time() - strtotime($result['fetched_at'])) / 60;
-        if ($age > self::CACHE_MINUTES) return false;
-        return json_decode($result['data_json'], true);
+        try {
+            $db  = getDB();
+            $sql = "SELECT data_json, fetched_at FROM weather_cache WHERE county = ? AND cache_key = ? LIMIT 1";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$county, $type]);
+            $result = $stmt->fetch();
+            if (!$result) return false;
+            $age = (time() - strtotime($result['fetched_at'])) / 60;
+            if ($age > self::CACHE_MINUTES) return false;
+            return json_decode($result['data_json'], true);
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     private static function setCache(string $county, string $type, array $data): void {
-        $db  = getDB();
-        $sql = "REPLACE INTO weather_cache (county, cache_key, data_json, fetched_at) VALUES (?, ?, ?, NOW())";
-        $db->prepare($sql)->execute([$county, $type, json_encode($data)]);
+        try {
+            $db  = getDB();
+            $sql = "REPLACE INTO weather_cache (county, cache_key, data_json, fetched_at) VALUES (?, ?, ?, NOW())";
+            $db->prepare($sql)->execute([$county, $type, json_encode($data)]);
+        } catch (\Throwable $e) {
+            // Ignore cache write errors if DB unavailable
+        }
     }
+
 
     private static function fetch(string $url): array {
         $ch = curl_init($url);

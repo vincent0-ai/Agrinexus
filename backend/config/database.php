@@ -61,13 +61,9 @@ function getDB(): PDO {
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
             autoInitDatabase($pdo);
         } catch (PDOException $e) {
-            http_response_code(500);
-            header('Content-Type: application/json');
-            die(json_encode([
-                'success' => false,
-                'message' => 'Database connection failed: ' . $e->getMessage()
-            ]));
+            throw new Exception('Database connection failed: ' . $e->getMessage());
         }
     }
     return $pdo;
 }
+
