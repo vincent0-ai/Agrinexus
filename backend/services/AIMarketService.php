@@ -31,7 +31,7 @@ class AIMarketService {
         $demand   = self::getDemandIndex();
         $topCrop  = $demand[0]['crop_name'] ?? 'Tomatoes';
         $topValue = $demand[0]['demand'] ?? 92;
-        $secondCrop = $demand[1]['crop_name'] ?? 'Avocados';
+        $secondCrop = $demand[1]['crop_name'] ?? 'Beans';
 
         return [
             "High market demand for {$topCrop} ({$topValue}% demand index) in {$county} region. Consider listing surplus stock on AgriNexus today.",
@@ -39,6 +39,35 @@ class AIMarketService {
             "Seasonal market trend: Grain prices expected to shift as regional harvests approach. Monitor weekly price alerts before bulk selling.",
         ];
     }
+
+    public static function getAIInsights(string $county = 'Kiambu'): array {
+        $demand    = self::getDemandIndex();
+        $bestCrop  = $demand[0]['crop_name'] ?? 'Tomatoes';
+        $bestVal   = $demand[0]['demand'] ?? 94;
+        $secondCrop = $demand[1]['crop_name'] ?? 'Beans';
+
+        return [
+            [
+                'label' => 'Best Crop to Sell',
+                'value' => $bestCrop,
+                'sub'   => "Demand: {$bestVal}% · Price rising",
+                'icon'  => 'TrendingUp',
+            ],
+            [
+                'label' => 'Predicted Price Trend',
+                'value' => "+15% {$secondCrop}",
+                'sub'   => 'Expected within 2 weeks',
+                'icon'  => 'BarChart2',
+            ],
+            [
+                'label' => 'Demand Hotspot',
+                'value' => ucfirst($county) . ' & Regional Hubs',
+                'sub'   => 'Highest buyer concentration',
+                'icon'  => 'MapPin',
+            ],
+        ];
+    }
+
 
 
     private static function pivotByMonth(array $rows): array {

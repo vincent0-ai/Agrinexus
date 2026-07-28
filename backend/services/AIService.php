@@ -103,30 +103,41 @@ PROMPT,
     // ── Weather Prediction ────────────────────────────────────────────────────
 
     public static function predictWeather(string $county, string $crop, array $weatherData): array {
+        $cacheKey = "ai_pred_" . md5($crop);
+        $cached   = self::getAICache($county, $cacheKey, 180); // 3 hours TTL
+        if ($cached) return $cached;
+
         $contextData = "County: $county\n";
         if ($crop) $contextData .= "Farmer's Crop: $crop\n";
         $contextData .= "Current Weather & Forecast: " . json_encode($weatherData, JSON_PRETTY_PRINT);
 
         $prompt = "Based on the current weather data provided, give me a comprehensive farming prediction and advisory for a farmer in $county county, Kenya.";
         if ($crop) $prompt .= " Primary crop: $crop.";
-        $prompt .= " Include: 1) Weather outlook summary, 2) Specific farming actions for this week, 3) Risk alerts, 4) Optimal timing for key activities.";
+        $prompt .= " Include: 1) Weather outlook summary, 2) Specific farming actions for this week, 3) Risk alerts, 4) Optimal timing for key activities. Format clearly with headings and bullet points.";
 
         $result = self::chat('auto', 'weather', $prompt, [], $contextData);
 
-        return [
+        $response = [
             'prediction'   => $result['response'],
             'provider'     => 'AgriNexus AI Engine',
             'county'       => $county,
             'crop'         => $crop,
             'generated_at' => date('Y-m-d H:i:s'),
         ];
+
+        self::setAICache($county, $cacheKey, $response);
+        return $response;
     }
 
     // ── Dynamic Farming Advisories ────────────────────────────────────────────
 
     public static function getFarmingAdvisories(string $county): array {
+        $cached = self::getAICache($county, 'ai_adv', 180); // 3 hours TTL
+        if ($cached) return $cached;
+
         $weather  = WeatherAPIService::getCurrentWeather($county);
         $forecast = WeatherAPIService::getForecast($county, 5);
+        $advisories = [];
 
         if (!empty(GEMINI_API_KEY) || !empty(DEEPSEEK_API_KEY)) {
             $extraContext  = "Current Weather in $county: {$weather['temp']}°C, {$weather['condition']}, Wind: {$weather['wind']}, Humidity: {$weather['humidity']}, UV: {$weather['uvIndex']}.\n";
@@ -136,12 +147,16 @@ PROMPT,
             $res  = self::chat('auto', 'weather', $prompt, [], $extraContext);
             $json = json_decode(trim(str_replace(['```json', '```'], '', $res['response'])), true);
             if (is_array($json) && count($json) > 0) {
-                return $json;
+                $advisories = $json;
             }
         }
 
-        // Dynamic weather-calculated fallback advisories (never hardcoded static)
-        return self::generateDynamicAdvisoriesFromWeather($county, $weather, $forecast);
+        if (empty($advisories)) {
+            $advisories = self::generateDynamicAdvisoriesFromWeather($county, $weather, $forecast);
+        }
+
+        self::setAICache($county, 'ai_adv', $advisories);
+        return $advisories;
     }
 
     private static function generateDynamicAdvisoriesFromWeather(string $county, array $weather, array $forecast): array {
@@ -200,6 +215,10 @@ PROMPT,
     // ── Market Analysis ───────────────────────────────────────────────────────
 
     public static function analyzeMarket(string $county, string $crop, array $marketData): array {
+        $cacheKey = "ai_mkt_" . md5($crop);
+        $cached   = self::getAICache($county, $cacheKey, 360); // 6 hours TTL
+        if ($cached) return $cached;
+
         $contextData = "County: $county\n";
         if ($crop) $contextData .= "Focus Crop: $crop\n";
         $contextData .= "Current Market Data: " . json_encode($marketData, JSON_PRETTY_PRINT);
@@ -210,14 +229,18 @@ PROMPT,
 
         $result = self::chat('auto', 'market', $prompt, [], $contextData);
 
-        return [
+        $response = [
             'analysis'     => $result['response'],
             'provider'     => 'AgriNexus AI Engine',
             'county'       => $county,
             'crop'         => $crop,
             'generated_at' => date('Y-m-d H:i:s'),
         ];
+
+        self::setAICache($county, $cacheKey, $response);
+        return $response;
     }
+
 
     // ── Provider Implementations ──────────────────────────────────────────────
 
@@ -232,7 +255,7 @@ PROMPT,
             'generationConfig' => [
                 'temperature'     => 0.7,
                 'topP'            => 0.9,
-                'maxOutputTokens' => 1024,
+                'maxOutputTokens' => 2048,
             ],
         ];
 
@@ -283,8 +306,9 @@ PROMPT,
             'model'       => 'deepseek-chat',
             'messages'    => $messages,
             'temperature' => 0.7,
-            'max_tokens'  => 1024,
+            'max_tokens'  => 2048,
         ];
+
 
         $response = self::curlPost($url, $payload, [
             'Authorization: Bearer ' . DEEPSEEK_API_KEY,
@@ -381,5 +405,35 @@ PROMPT,
             ],
         ];
     }
+
+    // ── Cache Helpers ─────────────────────────────────────────────────────────
+
+    private static function getAICache(string $county, string $cacheKey, int $ttlMinutes = 180): array|false {
+
+        try {
+            $db  = getDB();
+            $sql = "SELECT data_json, fetched_at FROM weather_cache WHERE county = ? AND cache_key = ? LIMIT 1";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$county, $cacheKey]);
+            $result = $stmt->fetch();
+            if (!$result) return false;
+            $age = (time() - strtotime($result['fetched_at'])) / 60;
+            if ($age > $ttlMinutes) return false;
+            return json_decode($result['data_json'], true);
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    private static function setAICache(string $county, string $cacheKey, array $data): void {
+        try {
+            $db  = getDB();
+            $sql = "REPLACE INTO weather_cache (county, cache_key, data_json, fetched_at) VALUES (?, ?, ?, NOW())";
+            $db->prepare($sql)->execute([$county, $cacheKey, json_encode($data)]);
+        } catch (\Throwable $e) {
+            // Ignore cache write errors
+        }
+    }
 }
+
 
