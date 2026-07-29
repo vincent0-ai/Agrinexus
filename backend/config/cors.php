@@ -1,13 +1,26 @@
 <?php
 // agrinexus-api/config/cors.php
-// Allow Vite dev server (port 5173) and production domain
+// Allow configured origins (via ALLOWED_ORIGINS env) or common dev origins
 
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
-if ($origin && $origin !== '*') {
+$allowed = [];
+if (!empty(getenv('ALLOWED_ORIGINS'))) {
+    $allowed = array_map('trim', explode(',', getenv('ALLOWED_ORIGINS')));
+} else {
+    // sensible defaults for local development (Vite) — add production domains via ALLOWED_ORIGINS
+    $allowed = [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'http://localhost:3000',
+    ];
+}
+
+if ($origin && in_array($origin, $allowed, true)) {
     header("Access-Control-Allow-Origin: $origin");
     header("Vary: Origin");
 } else {
+    // fallback for unspecified origins — keep permissive for demo/dev but encourage using ALLOWED_ORIGINS
     header('Access-Control-Allow-Origin: *');
 }
 
