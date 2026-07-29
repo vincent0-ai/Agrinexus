@@ -57,7 +57,7 @@ export function BuyerDashboard() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard
             label="Orders Placed"
             value={loading ? "—" : String(orders.length)}
@@ -92,7 +92,7 @@ export function BuyerDashboard() {
           {loading ? (
             <div className="p-8 text-center text-sm text-muted-foreground">Loading...</div>
           ) : (
-            <div className="p-5 grid grid-cols-4 gap-4">
+            <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {products.slice(0, 4).map((p) => (
                 <ProductCard
                   key={p.id}
@@ -121,7 +121,8 @@ export function BuyerDashboard() {
           ) : orders.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">No orders yet. Start shopping!</div>
           ) : (
-            <table className="w-full text-sm">
+            <div className="responsive-table">
+            <table className="w-full text-sm min-w-[600px]">
               <thead>
                 <tr className="text-left text-xs text-muted-foreground bg-muted/30 border-b border-border">
                   {["Order ID", "Product", "Farmer", "Total", "Date", "Status"].map((h) => (
@@ -146,6 +147,7 @@ export function BuyerDashboard() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>

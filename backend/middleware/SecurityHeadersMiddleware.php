@@ -22,6 +22,6 @@ class SecurityHeadersMiddleware
         }
 
         // Content-Security-Policy: keep fairly strict but allow dev tools and external APIs
-        header("Content-Security-Policy: default-src 'self'; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:;");
+        header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https: wss:; img-src 'self' https: data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:;");
     }
 }

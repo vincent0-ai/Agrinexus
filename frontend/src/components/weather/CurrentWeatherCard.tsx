@@ -95,7 +95,7 @@ export function CurrentWeatherCard({ compact = false }: { compact?: boolean }) {
           <WeatherEmoji icon={current.icon} />
         </span>
       </div>
-      <div className="grid grid-cols-4 gap-4 mt-7 pt-6 border-t border-white/15">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-7 pt-6 border-t border-white/15">
         {[
           { label: "Wind",       value: current.wind,       Icon: Wind     },
           { label: "Humidity",   value: current.humidity,   Icon: Droplets },

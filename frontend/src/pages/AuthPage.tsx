@@ -183,9 +183,9 @@ export function AuthPage() {
   };
 
   return (
-    <div className="h-screen grid grid-cols-2 overflow-hidden" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+    <div className="h-screen grid grid-cols-1 md:grid-cols-2 overflow-hidden" style={{ fontFamily: "'DM Sans', sans-serif" }}>
       {/* Left panel */}
-      <div className="relative flex flex-col items-center justify-center p-12 overflow-hidden" style={{ background: GREEN }}>
+      <div className="relative hidden md:flex flex-col items-center justify-center p-12 overflow-hidden" style={{ background: GREEN }}>
         <div className="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&h=900&fit=crop&auto=format" alt="Farm landscape at golden hour" className="w-full h-full object-cover opacity-20" />
         </div>

@@ -8,17 +8,19 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-white overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style={{ fontFamily: "'DM Sans', sans-serif" }}>
       {/* Navbar */}
-      <nav className="flex items-center justify-between px-8 py-4 border-b border-border">
+      <nav className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: GREEN }}>
             <Leaf className="w-3.5 h-3.5 text-white" />
           </div>
           <span className="text-lg font-extrabold" style={{ color: GREEN, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>AgriNexus</span>
         </div>
-        <div className="flex items-center gap-8 text-sm">
+        <div className="flex items-center gap-4 sm:gap-8 text-sm">
+          <div className="hidden sm:flex items-center gap-8">
           {["Features", "How it Works", "Pricing"].map((l) => (
             <a key={l} href="#" className="text-muted-foreground hover:text-foreground transition-colors">{l}</a>
           ))}
+          </div>
           <button
             onClick={() => setPage("login")}
             className="px-5 py-2 rounded-xl text-white text-sm font-semibold transition-opacity hover:opacity-90"
@@ -30,12 +32,12 @@ export function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="grid grid-cols-2 min-h-[560px]">
-        <div className="flex flex-col justify-center px-16 py-16">
+      <section className="grid grid-cols-1 md:grid-cols-2 min-h-[400px] md:min-h-[560px]">
+        <div className="flex flex-col justify-center px-6 sm:px-12 lg:px-16 py-10 sm:py-16">
           <div className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full w-fit mb-7" style={{ background: GREEN + "15", color: GREEN }}>
             <Leaf className="w-3 h-3" /> Kenya&apos;s #1 AgriTech Platform
           </div>
-          <h1 className="text-5xl font-black leading-[1.12] mb-5" style={{ color: "#1A2E22", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.12] mb-5" style={{ color: "#1A2E22", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             From Farm<br />to Market,<br /><span style={{ color: GREEN }}>Digitally.</span>
           </h1>
           <p className="text-base text-muted-foreground mb-8 max-w-sm leading-relaxed">
@@ -66,7 +68,7 @@ export function LandingPage() {
             ))}
           </div>
         </div>
-        <div className="relative overflow-hidden bg-emerald-50">
+        <div className="relative overflow-hidden bg-emerald-50 min-h-[250px] md:min-h-0">
           <img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=900&h=620&fit=crop&auto=format" alt="Farmer using a tablet in a lush farm field" className="w-full h-full object-cover" />
           <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(255,255,255,0.15), transparent 60%)" }} />
           <div className="absolute bottom-8 left-8 bg-white rounded-2xl shadow-xl p-4 max-w-[200px]">
@@ -94,7 +96,7 @@ export function LandingPage() {
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: AMBER }}>Platform Features</p>
             <h2 className="text-3xl font-black" style={{ color: "#1A2E22", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Everything you need to grow</h2>
           </div>
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { icon: ShoppingCart, title: "Smart Marketplace",  desc: "Buy and sell directly. No middlemen. Verified farmers, real-time prices, and secure payments.", color: GREEN     },
               { icon: Cpu,          title: "IoT Farm Monitor",   desc: "Track soil moisture, temperature, humidity, and light from anywhere via smart wireless sensors.",  color: "#1A5276" },
@@ -119,7 +121,7 @@ export function LandingPage() {
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: AMBER }}>Simple Process</p>
             <h2 className="text-3xl font-black" style={{ color: "#1A2E22", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>How it works</h2>
           </div>
-          <div className="grid grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { step: "01", title: "Create Your Account", desc: "Sign up as a farmer or buyer. Verify your identity and complete your profile in minutes.", icon: Users      },
               { step: "02", title: "List or Browse",      desc: "Farmers list produce with photos and prices. Buyers browse, filter, and compare offers.",   icon: Package    },
@@ -143,7 +145,7 @@ export function LandingPage() {
 
       {/* Footer */}
       <footer style={{ background: GREEN }} className="px-8 py-10">
-        <div className="flex items-center justify-between max-w-5xl mx-auto">
+        <div className="flex flex-col sm:flex-row items-center justify-between max-w-5xl mx-auto gap-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Leaf className="w-5 h-5" style={{ color: AMBER }} />

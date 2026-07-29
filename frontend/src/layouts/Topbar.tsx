@@ -69,18 +69,18 @@ export function Topbar({ title }: TopbarProps) {
   });
 
   return (
-    <header className="sticky top-0 z-40 flex h-20 items-center justify-between border-b border-border/50 bg-background/80 px-8 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 flex h-16 sm:h-20 items-center justify-between border-b border-border/50 bg-background/80 px-4 sm:px-8 backdrop-blur-xl">
 
       {/* Left */}
       <div className="space-y-1">
         <h1
-          className="text-2xl font-bold tracking-tight text-foreground"
+          className="text-lg sm:text-2xl font-bold tracking-tight text-foreground"
           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
         >
           {title}
         </h1>
 
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
           <Sparkles className="h-4 w-4 text-yellow-500" />
 
           <span>
@@ -126,7 +126,7 @@ export function Topbar({ title }: TopbarProps) {
 
           {/* Avatar */}
           <div
-            className="relative flex h-12 w-12 items-center justify-center rounded-2xl text-sm font-bold text-white shadow-lg"
+            className="relative flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-white shadow-lg"
             style={{
               background: `linear-gradient(135deg, ${GREEN}, #34d399)`,
             }}

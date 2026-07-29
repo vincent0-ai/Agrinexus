@@ -19,7 +19,7 @@ export function IoTMonitor() {
     <DashboardLayout title={`Farm Monitor — ${countyName}`}>
       <div className="space-y-5">
         {/* Metric cards */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {iotMetrics.map((m) => {
             const Icon = METRIC_ICONS[m.label] ?? Activity;
             return (
@@ -37,8 +37,8 @@ export function IoTMonitor() {
         </div>
 
         {/* Chart + alerts */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2 bg-card rounded-2xl border border-border p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 bg-card rounded-2xl border border-border p-6">
             <h2 className="font-bold text-foreground mb-5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>24-Hour Sensor Readings</h2>
             <SensorLineChart />
           </div>
@@ -65,7 +65,8 @@ export function IoTMonitor() {
           <div className="px-6 py-4 border-b border-border">
             <h2 className="font-bold text-foreground" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Recent Readings</h2>
           </div>
-          <table className="w-full text-sm">
+          <div className="responsive-table">
+          <table className="w-full text-sm min-w-[500px]">
             <thead>
               <tr className="text-left text-xs text-muted-foreground bg-muted/30 border-b border-border">
                 {["Timestamp", "Temp (°C)", "Humidity (%)", "Soil Moisture (%)", "Light (lux)"].map((h) => (
@@ -85,6 +86,7 @@ export function IoTMonitor() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </DashboardLayout>

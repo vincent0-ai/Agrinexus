@@ -65,7 +65,7 @@ export function FarmerDashboard() {
         </div>
 
         {/* Stat cards */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             label="Total Products"
             value={loading ? "—" : String(totalProducts)}
@@ -94,9 +94,9 @@ export function FarmerDashboard() {
           />
         </div>
 
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
           {/* Recent orders table */}
-          <div className="col-span-3 bg-card rounded-2xl border border-border overflow-hidden">
+          <div className="lg:col-span-3 bg-card rounded-2xl border border-border overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-border">
               <h2 className="font-bold text-foreground" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Recent Orders
@@ -111,7 +111,8 @@ export function FarmerDashboard() {
             ) : orders.length === 0 ? (
               <div className="px-6 py-8 text-center text-sm text-muted-foreground">No orders yet.</div>
             ) : (
-              <table className="w-full text-sm">
+              <div className="responsive-table">
+              <table className="w-full text-sm min-w-[500px]">
                 <thead>
                   <tr className="text-left text-xs text-muted-foreground bg-muted/30 border-b border-border">
                     {["Order ID", "Product", "Buyer", "Amount", "Status"].map((h) => (
@@ -133,11 +134,12 @@ export function FarmerDashboard() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
 
           {/* Right column */}
-          <div className="col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-4">
             <CurrentWeatherCard compact />
             <button
               onClick={() => setPage("weather")}

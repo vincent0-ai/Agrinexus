@@ -16,7 +16,7 @@ export function ForecastStrip() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2">
         {Array(7).fill(0).map((_, i) => (
           <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
         ))}
@@ -25,7 +25,7 @@ export function ForecastStrip() {
   }
 
   return (
-    <div className="grid grid-cols-7 gap-2">
+    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2">
       {forecast.map((f, i) => (
         <div
           key={f.day}
