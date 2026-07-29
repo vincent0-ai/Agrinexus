@@ -19,10 +19,14 @@ try {
     if (!defined('DEEPSEEK_BASE_URL'))define('DEEPSEEK_BASE_URL', getenv('DEEPSEEK_BASE_URL') ?: 'https://api.deepseek.com/v1');
 
     require_once __DIR__ . '/middleware/RateLimitMiddleware.php';
+    require_once __DIR__ . '/middleware/SecurityHeadersMiddleware.php';
     require_once __DIR__ . '/utils/Response.php';
     require_once __DIR__ . '/routes/api.php';
 
     header('Content-Type: application/json');
+
+    // Apply security headers early
+    SecurityHeadersMiddleware::apply();
 
     RateLimitMiddleware::handle();
 

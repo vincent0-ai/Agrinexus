@@ -1,0 +1,31 @@
+:root {
+	--container-max-width: 1200px;
+	--container-padding: 1rem;
+}
+
+/* Ensure root app content stays centered and responsive */
+#root > * {
+	max-width: var(--container-max-width);
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: var(--container-padding);
+	padding-right: var(--container-padding);
+	box-sizing: border-box;
+}
+
+/* Images and media scale down on small screens */
+img, video, canvas {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+/* Make tables horizontally scrollable on small screens */
+.responsive-table {
+	width: 100%;
+	overflow-x: auto;
+}
+
+@media (max-width: 640px) {
+	:root { --container-padding: 0.75rem; }
+}
