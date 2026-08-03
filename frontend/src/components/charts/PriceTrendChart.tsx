@@ -1,11 +1,11 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { priceData } from "@/data/marketData";
 import { GREEN, AMBER } from "@/utils/constants";
+import type { PriceTrendPoint } from "@/hooks/useMarketData";
 
-export function PriceTrendChart() {
+export function PriceTrendChart({ data }: { data: PriceTrendPoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
-      <LineChart data={priceData}>
+      <LineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
         <XAxis dataKey="month" tick={{ fontSize: 11 }} tickLine={false} />
         <YAxis tick={{ fontSize: 11 }} tickLine={false} />

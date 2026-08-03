@@ -47,6 +47,7 @@ if ($method === 'PATCH' && preg_match('#^orders/(\d+)/status$#', $path, $m)) { O
     if ($method === 'GET'   && $path === 'market/demand')       { MarketController::demandIndex();       return; }
     if ($method === 'GET'   && $path === 'market/insights')     { MarketController::aiInsights();        return; }
     if ($method === 'GET'   && $path === 'market/recommendations') { MarketController::aiRecommendations(); return; }
+    if ($method === 'GET'   && $path === 'market/seed')         { require_once __DIR__ . '/../database/seed_market.php'; return; }
 
     // IoT routes
     if ($method === 'GET'   && $path === 'iot/readings')        { IoTController::readings();       return; }
