@@ -12,7 +12,7 @@ interface Props {
 export function MarketAnalysisCard({ county = "Kiambu", crop = "" }: Props) {
   const [analysis, setAnalysis] = useState<MarketAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchAnalysis = async () => {

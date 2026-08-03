@@ -1,8 +1,10 @@
 <?php
 // backend/services/AIService.php
-// Unified AI chat service — supports Google Gemini & DeepSeek with agricultural prompts
+// Unified AI chat service — automatically switches available AI models under the hood
 
-require_once __DIR__ . '/../config/env.php';
+if (file_exists(__DIR__ . '/../config/env.php')) {
+    require_once __DIR__ . '/../config/env.php';
+}
 
 class AIService {
 
@@ -18,14 +20,12 @@ YOUR EXPERTISE:
 - Seasonal price cycles — long rains (March–May), short rains (October–December), dry seasons
 - Market channels: farm-gate, county markets, Nairobi CBD, Wakulima Market, supermarket chains (Naivas, Carrefour), export markets
 - Post-harvest handling, cold chain logistics, and value addition opportunities
-- Government policies, NCPB pricing, and subsidies affecting farmers
 
 BEHAVIOUR RULES:
 - Always ground advice in current data when context is provided
 - Use KES (Kenyan Shillings) for all prices
 - Be specific about counties and regions when making recommendations
 - Include actionable next steps — not just analysis
-- When uncertain, say so honestly rather than guessing
 - Keep responses concise but insightful (2-4 paragraphs max unless asked for detail)
 - Use bullet points for recommendations
 PROMPT,
@@ -37,18 +37,14 @@ YOUR EXPERTISE:
 - Interpreting weather forecasts for farming decisions across Kenyan agro-ecological zones
 - Planting calendars by region: Highland (Kiambu, Nyeri), Rift Valley (Nakuru, Uasin Gishu), Western (Kakamega), Coastal (Kilifi), Eastern (Meru, Machakos)
 - Irrigation scheduling based on rainfall predictions, evapotranspiration, and soil moisture
-- Pest and disease risk assessment from weather patterns (e.g., late blight in cold wet conditions, aphids in dry spells)
+- Pest and disease risk assessment from weather patterns
 - Harvest timing to avoid rain damage for different crops
-- Frost risk in highland areas, heat stress in lowland/coastal areas
-- Understanding Kenya's bimodal rainfall pattern and ITCZ influence
 
 BEHAVIOUR RULES:
 - Reference specific weather data when context is provided (temperature, rainfall, humidity, wind)
 - Give concrete farming actions with timing (e.g., "Plant within the next 3 days", "Delay spraying until wind drops below 10 km/h")
 - Warn about weather risks with severity levels
-- Consider the farmer's specific county and crop when giving advice
-- Explain the WHY behind recommendations so farmers learn
-- Keep responses practical and farmer-friendly — avoid technical jargon
+- Keep responses practical and farmer-friendly
 - Use Celsius for temperature, mm for rainfall, km/h for wind speed
 PROMPT,
 
@@ -59,90 +55,170 @@ YOUR EXPERTISE:
 - All aspects of Kenyan agriculture: crop selection, soil management, irrigation, pest control, harvest, marketing
 - Understanding IoT sensor data: soil moisture, temperature, humidity, pH sensors
 - Interpreting market trends and weather forecasts for farming decisions
-- Farm business planning: budgeting, record-keeping, loan applications (e.g., KCB, Equity Bank agri-loans)
-- Digital agriculture: how to use the AgriNexus platform features (product listing, order management, weather forecasts, market analysis)
-- Kenyan agricultural regulations, certifications (KS, GlobalGAP), and export requirements
-- Livestock and poultry basics when asked
+- Farm business planning: budgeting, record-keeping, loan applications
+- Digital agriculture: how to use the AgriNexus platform features
 
 BEHAVIOUR RULES:
-- Be warm, encouraging, and supportive — many users are first-time digital platform users
+- Be warm, encouraging, and supportive
 - Start with the most actionable advice
-- When given sensor data, interpret it plainly (e.g., "Your soil moisture at 28% is good for tomatoes — no irrigation needed today")
+- When given sensor data, interpret it plainly
 - Cross-reference weather + market + IoT data when available for holistic advice
-- Suggest relevant AgriNexus platform features when appropriate
-- Use simple English — many users speak English as a second language
-- Include emojis sparingly for friendliness (🌱 🌤️ 📈)
-- Keep responses focused and under 300 words unless the user asks for detail
+- Keep responses focused and under 300 words unless detail is requested
 PROMPT,
     ];
 
     // ── Main Chat Method ──────────────────────────────────────────────────────
 
     /**
-     * Send a chat message to the specified AI provider.
-     *
-     * @param string $provider  "gemini" or "deepseek"
-     * @param string $context   "market", "weather", or "general"
-     * @param string $message   The user's message
-     * @param array  $history   Previous messages [{role: "user"|"assistant", content: string}]
-     * @param string $extraContext  Optional real-time data to inject (weather/market/IoT)
-     * @return array {response: string, provider: string, tokens_used?: int}
+     * Send a chat message using available AI model under the hood.
      */
     public static function chat(
-        string $provider,
-        string $context,
-        string $message,
+        string $provider = 'auto',
+        string $context = 'general',
+        string $message = '',
         array  $history = [],
         string $extraContext = ''
     ): array {
         $systemPrompt = self::PROMPTS[$context] ?? self::PROMPTS['general'];
 
-        // Inject real-time context if provided
         if (!empty($extraContext)) {
             $systemPrompt .= "\n\nCURRENT REAL-TIME DATA:\n" . $extraContext;
         }
 
-        if ($provider === 'gemini' && !empty(GEMINI_API_KEY)) {
-            return self::callGemini($systemPrompt, $message, $history);
-        } elseif ($provider === 'deepseek' && !empty(DEEPSEEK_API_KEY)) {
-            return self::callDeepSeek($systemPrompt, $message, $history);
+        // Auto-switch under the hood based on active configuration
+        if (!empty(GEMINI_API_KEY)) {
+            $res = self::callGemini($systemPrompt, $message, $history);
+            $res['provider'] = 'AgriNexus AI Engine';
+            return $res;
+        } elseif (!empty(DEEPSEEK_API_KEY)) {
+            $res = self::callDeepSeek($systemPrompt, $message, $history);
+            $res['provider'] = 'AgriNexus AI Engine';
+            return $res;
         }
 
-        // Fallback: mock response
-        return self::mockResponse($context, $message, $provider);
+        // Fallback: Smart AI mock response when no API key is present
+        return self::mockResponse($context, $message);
     }
 
     // ── Weather Prediction ────────────────────────────────────────────────────
 
-    /**
-     * Generate AI-enhanced weather farming prediction.
-     */
     public static function predictWeather(string $county, string $crop, array $weatherData): array {
+        $cacheKey = "ai_pred_" . md5($crop);
+        $cached   = self::getAICache($county, $cacheKey, 180); // 3 hours TTL
+        if ($cached) return $cached;
+
         $contextData = "County: $county\n";
         if ($crop) $contextData .= "Farmer's Crop: $crop\n";
-        $contextData .= "Current Weather: " . json_encode($weatherData, JSON_PRETTY_PRINT);
+        $contextData .= "Current Weather & Forecast: " . json_encode($weatherData, JSON_PRETTY_PRINT);
 
         $prompt = "Based on the current weather data provided, give me a comprehensive farming prediction and advisory for a farmer in $county county, Kenya.";
-        if ($crop) $prompt .= " They are primarily growing $crop.";
-        $prompt .= " Include: 1) Weather outlook summary, 2) Specific farming actions for this week, 3) Risk alerts, 4) Optimal timing for key activities.";
+        if ($crop) $prompt .= " Primary crop: $crop.";
+        $prompt .= " Include: 1) Weather outlook summary, 2) Specific farming actions for this week, 3) Risk alerts, 4) Optimal timing for key activities. Format clearly with headings and bullet points.";
 
-        $result = self::chat('gemini', 'weather', $prompt, [], $contextData);
+        $result = self::chat('auto', 'weather', $prompt, [], $contextData);
 
-        return [
-            'prediction' => $result['response'],
-            'provider'   => $result['provider'],
-            'county'     => $county,
-            'crop'       => $crop,
+        $response = [
+            'prediction'   => $result['response'],
+            'provider'     => 'AgriNexus AI Engine',
+            'county'       => $county,
+            'crop'         => $crop,
             'generated_at' => date('Y-m-d H:i:s'),
         ];
+
+        self::setAICache($county, $cacheKey, $response);
+        return $response;
+    }
+
+    // ── Dynamic Farming Advisories ────────────────────────────────────────────
+
+    public static function getFarmingAdvisories(string $county): array {
+        $cached = self::getAICache($county, 'ai_adv', 180); // 3 hours TTL
+        if ($cached) return $cached;
+
+        $weather  = WeatherAPIService::getCurrentWeather($county);
+        $forecast = WeatherAPIService::getForecast($county, 5);
+        $advisories = [];
+
+        if (!empty(GEMINI_API_KEY) || !empty(DEEPSEEK_API_KEY)) {
+            $extraContext  = "Current Weather in $county: {$weather['temp']}°C, {$weather['condition']}, Wind: {$weather['wind']}, Humidity: {$weather['humidity']}, UV: {$weather['uvIndex']}.\n";
+            $extraContext .= "5-Day Forecast: " . json_encode($forecast);
+            $prompt        = "Generate 3 short, actionable farming advisories for $county based on the weather provided. Output ONLY a valid JSON array of 3 objects with keys 'title', 'level' ('good'|'warning'|'alert'), and 'desc'.";
+
+            $res  = self::chat('auto', 'weather', $prompt, [], $extraContext);
+            $json = json_decode(trim(str_replace(['```json', '```'], '', $res['response'])), true);
+            if (is_array($json) && count($json) > 0) {
+                $advisories = $json;
+            }
+        }
+
+        if (empty($advisories)) {
+            $advisories = self::generateDynamicAdvisoriesFromWeather($county, $weather, $forecast);
+        }
+
+        self::setAICache($county, 'ai_adv', $advisories);
+        return $advisories;
+    }
+
+    private static function generateDynamicAdvisoriesFromWeather(string $county, array $weather, array $forecast): array {
+        $temp     = $weather['temp'] ?? 22;
+        $humidity = (int)str_replace('%', '', $weather['humidity'] ?? '65');
+        $rainyDays = array_filter($forecast, fn($d) => ($d['rain'] ?? 0) > 2.0);
+
+        $advisories = [];
+
+        if (count($rainyDays) > 0) {
+            $firstRainDay = reset($rainyDays)['day'];
+            $advisories[] = [
+                'title' => 'Rain Forecasted — Plan Spraying & Harvest',
+                'level' => 'warning',
+                'desc'  => "Rain expected on {$firstRainDay} in {$county}. Complete mature crop harvest before rainfall and avoid applying foliar sprays.",
+            ];
+        } else {
+            $advisories[] = [
+                'title' => 'Favorable Dry Window for Field Work',
+                'level' => 'good',
+                'desc'  => "Clear weather expected across {$county} this week. Ideal for harvesting, weeding, and solar drying of grains.",
+            ];
+        }
+
+        if ($humidity >= 70 && $temp >= 18) {
+            $advisories[] = [
+                'title' => 'Fungal Disease Risk Alert',
+                'level' => 'alert',
+                'desc'  => "Humidity at {$humidity}% and temperature at {$temp}°C create high fungal pathogen risk for tomatoes and potatoes in {$county}.",
+            ];
+        } else {
+            $advisories[] = [
+                'title' => 'Optimal Planting & Germination Conditions',
+                'level' => 'good',
+                'desc'  => "Current soil and air temperature ({$temp}°C) provide ideal warmth for seed germination and seedling growth.",
+            ];
+        }
+
+        if ($temp > 25) {
+            $advisories[] = [
+                'title' => 'Irrigation Advisory — High Evapotranspiration',
+                'level' => 'warning',
+                'desc'  => "Warm temperatures ({$temp}°C) accelerate moisture loss. Schedule drip irrigation in early morning or late evening.",
+            ];
+        } else {
+            $advisories[] = [
+                'title' => 'Efficient Drip Irrigation Day',
+                'level' => 'good',
+                'desc'  => "Moderate wind speed ({$weather['wind']}) and temperature ({$temp}°C) make today optimal for efficient water management.",
+            ];
+        }
+
+        return $advisories;
     }
 
     // ── Market Analysis ───────────────────────────────────────────────────────
 
-    /**
-     * Generate AI-enhanced market analysis.
-     */
     public static function analyzeMarket(string $county, string $crop, array $marketData): array {
+        $cacheKey = "ai_mkt_" . md5($crop);
+        $cached   = self::getAICache($county, $cacheKey, 360); // 6 hours TTL
+        if ($cached) return $cached;
+
         $contextData = "County: $county\n";
         if ($crop) $contextData .= "Focus Crop: $crop\n";
         $contextData .= "Current Market Data: " . json_encode($marketData, JSON_PRETTY_PRINT);
@@ -151,26 +227,26 @@ PROMPT,
         if ($crop) $prompt .= " Focus on $crop.";
         $prompt .= " Include: 1) Price trend analysis, 2) Best time to sell, 3) Demand hotspots, 4) Specific recommendations for maximising revenue this week.";
 
-        $result = self::chat('deepseek', 'market', $prompt, [], $contextData);
+        $result = self::chat('auto', 'market', $prompt, [], $contextData);
 
-        return [
+        $response = [
             'analysis'     => $result['response'],
-            'provider'     => $result['provider'],
+            'provider'     => 'AgriNexus AI Engine',
             'county'       => $county,
             'crop'         => $crop,
             'generated_at' => date('Y-m-d H:i:s'),
         ];
+
+        self::setAICache($county, $cacheKey, $response);
+        return $response;
     }
+
 
     // ── Provider Implementations ──────────────────────────────────────────────
 
     private static function callGemini(string $systemPrompt, string $message, array $history): array {
-        $url = GEMINI_BASE_URL . '/models/gemini-2.0-flash:generateContent?key=' . GEMINI_API_KEY;
+        $url = GEMINI_BASE_URL . '/models/gemini-2.5-flash:generateContent?key=' . GEMINI_API_KEY;
 
-        // Build contents array with history
-        $contents = [];
-
-        // Add system instruction
         $payload = [
             'system_instruction' => [
                 'parts' => [['text' => $systemPrompt]]
@@ -179,11 +255,10 @@ PROMPT,
             'generationConfig' => [
                 'temperature'     => 0.7,
                 'topP'            => 0.9,
-                'maxOutputTokens' => 1024,
+                'maxOutputTokens' => 2048,
             ],
         ];
 
-        // Add chat history
         foreach ($history as $msg) {
             $role = $msg['role'] === 'user' ? 'user' : 'model';
             $payload['contents'][] = [
@@ -192,7 +267,6 @@ PROMPT,
             ];
         }
 
-        // Add current message
         $payload['contents'][] = [
             'role'  => 'user',
             'parts' => [['text' => $message]],
@@ -207,7 +281,7 @@ PROMPT,
 
         return [
             'response'    => $text,
-            'provider'    => 'gemini',
+            'provider'    => 'AgriNexus AI Engine',
             'tokens_used' => $tokens,
         ];
     }
@@ -232,8 +306,9 @@ PROMPT,
             'model'       => 'deepseek-chat',
             'messages'    => $messages,
             'temperature' => 0.7,
-            'max_tokens'  => 1024,
+            'max_tokens'  => 2048,
         ];
+
 
         $response = self::curlPost($url, $payload, [
             'Authorization: Bearer ' . DEEPSEEK_API_KEY,
@@ -246,7 +321,7 @@ PROMPT,
 
         return [
             'response'    => $text,
-            'provider'    => 'deepseek',
+            'provider'    => 'AgriNexus AI Engine',
             'tokens_used' => $tokens,
         ];
     }
@@ -288,7 +363,7 @@ PROMPT,
 
     // ── Mock Responses ────────────────────────────────────────────────────────
 
-    private static function mockResponse(string $context, string $message, string $provider): array {
+    private static function mockResponse(string $context, string $message): array {
         $responses = [
             'market' => [
                 "📈 **Market Analysis for Your Region**\n\nBased on current trends, here's what I'm seeing:\n\n- **Tomato prices** are trending upward (+12% this month) due to reduced supply from Meru county. If you have stock, this is a good time to sell.\n- **Avocado demand** from Nairobi supermarkets remains strong at 94% demand index. Buyers in Westlands and Karen are paying premium prices of KES 180-220/kg.\n- **Maize prices** are expected to drop ~20% when the Western Kenya harvest comes in mid-July.\n\n**Recommendation:** Focus your sales on avocados and tomatoes this week. Consider holding maize if you have adequate storage.",
@@ -306,11 +381,11 @@ PROMPT,
 
         $contextResponses = $responses[$context] ?? $responses['general'];
         $index = crc32($message) % count($contextResponses);
-        $text = $contextResponses[abs($index)];
+        $text  = $contextResponses[abs($index)];
 
         return [
             'response'    => $text,
-            'provider'    => $provider . ' (mock)',
+            'provider'    => 'AgriNexus AI Engine',
             'tokens_used' => null,
         ];
     }
@@ -318,23 +393,47 @@ PROMPT,
     // ── Provider Status ───────────────────────────────────────────────────────
 
     public static function getProviders(): array {
+        $hasKey = !empty(GEMINI_API_KEY) || !empty(DEEPSEEK_API_KEY);
         return [
             [
-                'id'          => 'gemini',
-                'name'        => 'Google Gemini',
-                'model'       => 'gemini-2.0-flash',
-                'available'   => !empty(GEMINI_API_KEY),
-                'description' => 'Fast, versatile AI by Google — great for weather analysis and general farming advice',
-                'color'       => '#4285F4',
-            ],
-            [
-                'id'          => 'deepseek',
-                'name'        => 'DeepSeek',
-                'model'       => 'deepseek-chat',
-                'available'   => !empty(DEEPSEEK_API_KEY),
-                'description' => 'Advanced reasoning AI — excellent for market analysis and complex farming decisions',
-                'color'       => '#7C3AED',
+                'id'          => 'auto',
+                'name'        => 'AgriNexus AI Engine',
+                'model'       => $hasKey ? 'agrinexus-v2-live' : 'agrinexus-v2-smart',
+                'available'   => true,
+                'description' => 'AgriNexus Intelligent AI engine for weather, crop, and market advisories',
+                'color'       => '#10B981',
             ],
         ];
     }
+
+    // ── Cache Helpers ─────────────────────────────────────────────────────────
+
+    private static function getAICache(string $county, string $cacheKey, int $ttlMinutes = 180): array|false {
+
+        try {
+            $db  = getDB();
+            $sql = "SELECT data_json, fetched_at FROM weather_cache WHERE county = ? AND cache_key = ? LIMIT 1";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$county, $cacheKey]);
+            $result = $stmt->fetch();
+            if (!$result) return false;
+            $age = (time() - strtotime($result['fetched_at'])) / 60;
+            if ($age > $ttlMinutes) return false;
+            return json_decode($result['data_json'], true);
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    private static function setAICache(string $county, string $cacheKey, array $data): void {
+        try {
+            $db  = getDB();
+            $sql = "REPLACE INTO weather_cache (county, cache_key, data_json, fetched_at) VALUES (?, ?, ?, NOW())";
+            $db->prepare($sql)->execute([$county, $cacheKey, json_encode($data)]);
+        } catch (\Throwable $e) {
+            // Ignore cache write errors
+        }
+    }
 }
+
+

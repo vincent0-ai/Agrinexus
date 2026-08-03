@@ -15,12 +15,10 @@ class MarketController {
     }
 
     public static function aiInsights(): void {
-        Response::success([
-            ['label' => 'Best Crop to Sell',     'value' => 'Avocados',      'sub' => 'Demand: 94% · Price rising',      'icon' => 'TrendingUp'],
-            ['label' => 'Predicted Price Trend',  'value' => '+15% Tomatoes', 'sub' => 'Expected within 2 weeks',         'icon' => 'BarChart2' ],
-            ['label' => 'Demand Hotspot',         'value' => 'Nairobi CBD',   'sub' => 'Highest buyer concentration',     'icon' => 'MapPin'    ],
-        ]);
+        $county = $_GET['county'] ?? 'Kiambu';
+        Response::success(AIMarketService::getAIInsights($county));
     }
+
 
     public static function aiRecommendations(): void {
         $county = $_GET['county'] ?? 'Kiambu';

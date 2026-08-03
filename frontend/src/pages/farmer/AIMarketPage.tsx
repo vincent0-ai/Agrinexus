@@ -7,9 +7,13 @@ import { ChatFAB } from "@/components/ai/ChatFAB";
 import { GREEN, AMBER } from "@/utils/constants";
 import { aiInsights } from "@/data/marketData";
 
+import { useAuth } from "@/context/AuthContext";
+
 const ICON_MAP: Record<string, React.ElementType> = { TrendingUp, BarChart2, MapPin };
 
 export function AIMarketPage() {
+  const { user } = useAuth();
+
   return (
     <DashboardLayout title="AI Market Intelligence">
       <div className="space-y-5">
@@ -46,7 +50,7 @@ export function AIMarketPage() {
         </div>
 
         {/* AI Market Analysis — replaces static recommendations */}
-        <MarketAnalysisCard />
+        <MarketAnalysisCard county={user?.county} />
       </div>
 
       {/* Floating AI Chat Button */}

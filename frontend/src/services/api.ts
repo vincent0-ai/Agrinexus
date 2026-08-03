@@ -5,7 +5,11 @@ function getToken() {
 }
 
 async function request(method: string, path: string, body?: unknown) {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
+  const cleanBase = API_BASE_URL.replace(/\/+$/, "");
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  const url = `${cleanBase}${cleanPath}`;
+
+  const res = await fetch(url, {
     method,
     headers: {
       "Content-Type": "application/json",
@@ -13,8 +17,18 @@ async function request(method: string, path: string, body?: unknown) {
     },
     body: body ? JSON.stringify(body) : undefined,
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message ?? "Request failed");
+
+  const text = await res.text();
+  let data: any = {};
+  if (text && text.trim().length > 0) {
+    try {
+      data = JSON.parse(text);
+    } catch (err) {
+      throw new Error(`Server returned non-JSON response (${res.status}): ${text.substring(0, 150)}`);
+    }
+  }
+
+  if (!res.ok) throw new Error(data.message ?? data.error ?? `Request failed with status ${res.status}`);
   return data;
 }
 

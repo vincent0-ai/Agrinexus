@@ -10,8 +10,7 @@ import { suggestedPrompts } from "@/data/aiData";
 import type { AIProvider, AIContext } from "@/services/aiService";
 
 const PROVIDER_CONFIG = {
-  gemini: { name: "Gemini", color: "#4285F4", gradient: "from-blue-500 to-cyan-400" },
-  deepseek: { name: "DeepSeek", color: "#7C3AED", gradient: "from-violet-500 to-purple-400" },
+  auto: { name: "AgriNexus AI Engine", color: "#10B981", gradient: "from-emerald-500 to-teal-400" },
 };
 
 const CONTEXT_CONFIG: { id: AIContext; label: string; Icon: React.ElementType }[] = [
@@ -25,16 +24,26 @@ interface ChatPanelProps {
   compact?: boolean;
   onClose?: () => void;
   className?: string;
+  initialPrompt?: { prompt: string; context: AIContext; key?: number } | null;
 }
 
-export function ChatPanel({ defaultContext = "general", compact = false, onClose, className }: ChatPanelProps) {
+export function ChatPanel({ defaultContext = "general", compact = false, onClose, className, initialPrompt }: ChatPanelProps) {
   const {
     messages, loading, provider, context,
-    scrollRef, sendMessage, clearHistory, switchProvider, switchContext,
+    scrollRef, sendMessage, clearHistory, switchContext,
   } = useAIChat(defaultContext);
 
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Trigger quick action prompt if provided
+  useEffect(() => {
+    if (initialPrompt?.prompt) {
+      switchContext(initialPrompt.context);
+      sendMessage(initialPrompt.prompt);
+    }
+  }, [initialPrompt?.key]);
+
 
   // Auto-focus input
   useEffect(() => {
@@ -63,7 +72,7 @@ export function ChatPanel({ defaultContext = "general", compact = false, onClose
     }
   };
 
-  const providerCfg = PROVIDER_CONFIG[provider];
+  const providerCfg = PROVIDER_CONFIG.auto;
   const prompts = suggestedPrompts[context] ?? suggestedPrompts.general;
 
   return (
@@ -86,8 +95,8 @@ export function ChatPanel({ defaultContext = "general", compact = false, onClose
               <h3 className="text-sm font-bold text-foreground" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 AgriNexus AI
               </h3>
-              <p className="text-[10px] text-muted-foreground">
-                Powered by {providerCfg.name}
+              <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                Smart Agricultural Intelligence
               </p>
             </div>
           </div>
@@ -107,26 +116,6 @@ export function ChatPanel({ defaultContext = "general", compact = false, onClose
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
-          </div>
-        </div>
-
-        {/* Provider Toggle */}
-        <div className="flex items-center gap-2 mb-2">
-          <div className="flex bg-muted rounded-lg p-0.5 flex-1">
-            {(["gemini", "deepseek"] as AIProvider[]).map((p) => (
-              <button
-                key={p}
-                onClick={() => switchProvider(p)}
-                className={cn(
-                  "flex-1 text-[11px] font-semibold py-1.5 rounded-md transition-all",
-                  provider === p
-                    ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {PROVIDER_CONFIG[p].name}
-              </button>
-            ))}
           </div>
         </div>
 

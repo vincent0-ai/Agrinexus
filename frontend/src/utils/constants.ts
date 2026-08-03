@@ -4,7 +4,8 @@ export const GEMINI_BLUE = "#4285F4";
 export const DEEPSEEK_PURPLE = "#7C3AED";
 
 export const USE_MOCK = false; // set false to hit live PHP API
-export const API_BASE_URL =  import.meta.env.VITE_API_URL || "http://localhost/agrinexus";
+const rawApiUrl = import.meta.env?.VITE_API_BASE_URL ? String(import.meta.env.VITE_API_BASE_URL).replace(/^["']|["']$/g, '').trim() : "";
+export const API_BASE_URL = rawApiUrl || "/api";
 
 export const FARMER_NAV = [
   { id: "farmer-dashboard",    label: "Overview",           iconName: "LayoutDashboard" },
@@ -22,3 +23,13 @@ export const BUYER_NAV = [
   { id: "orders",           label: "My Orders",        iconName: "ShoppingCart"    },
   { id: "product-listing",  label: "Saved Farmers",    iconName: "Heart"           },
 ];
+
+export const KENYAN_COUNTIES = [
+  "Baringo", "Bomet", "Bungoma", "Busia", "Elgeyo Marakwet", "Embu", "Garissa", "Homa Bay",
+  "Isiolo", "Kajiado", "Kakamega", "Kericho", "Kiambu", "Kilifi", "Kirinyaga", "Kisii",
+  "Kisumu", "Kitui", "Kwale", "Laikipia", "Lamu", "Machakos", "Makueni", "Mandera",
+  "Marsabit", "Meru", "Migori", "Mombasa", "Murang'a", "Nairobi", "Nakuru", "Nandi",
+  "Narok", "Nyamira", "Nyandarua", "Nyeri", "Samburu", "Siaya", "Taita Taveta", "Tana River",
+  "Tharaka Nithi", "Trans Nzoia", "Turkana", "Uasin Gishu", "Vihiga", "Wajir", "West Pokot"
+];
+

@@ -44,7 +44,7 @@ export function ProductListingPage() {
       <div className="flex gap-5">
 
         {/* Filter sidebar */}
-        <aside className="w-48 flex-shrink-0">
+        <aside className="hidden md:block w-48 flex-shrink-0">
           <div className="bg-card rounded-2xl border border-border p-4 sticky top-0">
             <div className="flex items-center gap-2 mb-4">
               <Filter className="w-4 h-4 text-muted-foreground" />
@@ -120,7 +120,7 @@ export function ProductListingPage() {
           ) : products.length === 0 ? (
             <div className="text-center py-12 text-sm text-muted-foreground">No products found.</div>
           ) : (
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {products.map((p) => (
                 <ProductCard
                   key={p.id}

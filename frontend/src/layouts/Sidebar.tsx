@@ -11,7 +11,11 @@ const ICON_MAP: Record<string, React.ElementType> = {
   LayoutDashboard, Package, ShoppingCart, Cpu, CloudSun, TrendingUp, Heart, Bot,
 };
 
-export function Sidebar() {
+interface SidebarProps {
+  onNavigate?: () => void;
+}
+
+export function Sidebar({ onNavigate }: SidebarProps) {
   const { role, setRole, page, setPage } = useAuth();
   const nav = role === "farmer" ? FARMER_NAV : BUYER_NAV;
 
@@ -36,7 +40,7 @@ export function Sidebar() {
           return (
             <button
               key={item.label}
-              onClick={() => setPage(item.id as Parameters<typeof setPage>[0])}
+              onClick={() => { setPage(item.id as Parameters<typeof setPage>[0]); onNavigate?.(); }}
               className={cn(
                 "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all",
                 active ? "" : "text-white/55 hover:text-white hover:bg-white/10"
@@ -55,7 +59,7 @@ export function Sidebar() {
           <Settings className="w-4 h-4" /> Settings
         </button>
         <button
-          onClick={() => { setRole(null); setPage("landing"); }}
+          onClick={() => { setRole(null); setPage("landing"); onNavigate?.(); }}
           className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-white/55 hover:text-red-300 hover:bg-white/10 transition-all"
         >
           <LogOut className="w-4 h-4" /> Logout

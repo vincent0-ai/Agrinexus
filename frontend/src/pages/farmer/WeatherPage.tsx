@@ -9,10 +9,13 @@ import { ChatFAB } from "@/components/ai/ChatFAB";
 import { Droplets, AlertTriangle, Leaf } from "lucide-react";
 import { useWeather } from "@/hooks/useWeather";
 
+import { useAuth } from "@/context/AuthContext";
+
 const ICONS: Record<string, any> = { good: Leaf, warning: AlertTriangle };
 
 export function WeatherPage() {
   const { advisories, loading } = useWeather();
+  const { user } = useAuth();
 
   return (
     <DashboardLayout title="Weather Forecast">
@@ -27,20 +30,20 @@ export function WeatherPage() {
         </div>
 
         {/* AI Weather Prediction */}
-        <WeatherPredictionCard />
+        <WeatherPredictionCard county={user?.county} />
 
         <div>
           <h2 className="font-bold text-foreground mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             Farming Advisories
           </h2>
           {loading ? (
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array(3).fill(0).map((_, i) => (
                 <div key={i} className="h-36 bg-muted rounded-2xl animate-pulse" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {advisories.map((a) => {
                 const Icon = a.level === "warning" ? AlertTriangle : Leaf;
                 return (

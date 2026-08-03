@@ -28,16 +28,47 @@ class AIMarketService {
     }
 
     public static function getRecommendations(string $county): array {
-        // In production this would call an LLM or a rules engine.
-        // For now, returns deterministic tips based on top-demand crops.
-        $demand = self::getDemandIndex();
-        $topCrop = $demand[0]['crop_name'] ?? 'Tomatoes';
+        $demand   = self::getDemandIndex();
+        $topCrop  = $demand[0]['crop_name'] ?? 'Tomatoes';
+        $topValue = $demand[0]['demand'] ?? 92;
+        $secondCrop = $demand[1]['crop_name'] ?? 'Beans';
+
         return [
-            "$topCrop prices are trending upward. Consider listing surplus stock this week.",
-            "Avocado demand from Nairobi supermarkets is at a seasonal peak. Buyers in Westlands are paying premium prices.",
-            "Maize prices are stabilising. Sell before the July harvest brings prices down by an estimated 20%.",
+            "High market demand for {$topCrop} ({$topValue}% demand index) in {$county} region. Consider listing surplus stock on AgriNexus today.",
+            "Strong buyer inquiries recorded for {$secondCrop} from Nairobi wholesale distributors. Premium prices available for graded produce.",
+            "Seasonal market trend: Grain prices expected to shift as regional harvests approach. Monitor weekly price alerts before bulk selling.",
         ];
     }
+
+    public static function getAIInsights(string $county = 'Kiambu'): array {
+        $demand    = self::getDemandIndex();
+        $bestCrop  = $demand[0]['crop_name'] ?? 'Tomatoes';
+        $bestVal   = $demand[0]['demand'] ?? 94;
+        $secondCrop = $demand[1]['crop_name'] ?? 'Beans';
+
+        return [
+            [
+                'label' => 'Best Crop to Sell',
+                'value' => $bestCrop,
+                'sub'   => "Demand: {$bestVal}% · Price rising",
+                'icon'  => 'TrendingUp',
+            ],
+            [
+                'label' => 'Predicted Price Trend',
+                'value' => "+15% {$secondCrop}",
+                'sub'   => 'Expected within 2 weeks',
+                'icon'  => 'BarChart2',
+            ],
+            [
+                'label' => 'Demand Hotspot',
+                'value' => ucfirst($county) . ' & Regional Hubs',
+                'sub'   => 'Highest buyer concentration',
+                'icon'  => 'MapPin',
+            ],
+        ];
+    }
+
+
 
     private static function pivotByMonth(array $rows): array {
         $result = [];

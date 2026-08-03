@@ -123,7 +123,7 @@
 import { useState } from "react";
 import { Leaf, ShoppingBag } from "lucide-react";
 import { cn } from "@/utils/cn";
-import { GREEN } from "@/utils/constants";
+import { GREEN, KENYAN_COUNTIES } from "@/utils/constants";
 import { useAuth } from "@/context/AuthContext";
 
 export function AuthPage() {
@@ -142,7 +142,7 @@ export function AuthPage() {
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
   const [regConfirm, setRegConfirm] = useState("");
-  const [county, setCounty] = useState("");
+  const [county, setCounty] = useState("Kiambu");
 
   const handleLogin = async () => {
     setError("");
@@ -183,9 +183,9 @@ export function AuthPage() {
   };
 
   return (
-    <div className="h-screen grid grid-cols-2 overflow-hidden" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+    <div className="h-screen grid grid-cols-1 md:grid-cols-2 overflow-hidden" style={{ fontFamily: "'DM Sans', sans-serif" }}>
       {/* Left panel */}
-      <div className="relative flex flex-col items-center justify-center p-12 overflow-hidden" style={{ background: GREEN }}>
+      <div className="relative hidden md:flex flex-col items-center justify-center p-12 overflow-hidden" style={{ background: GREEN }}>
         <div className="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&h=900&fit=crop&auto=format" alt="Farm landscape at golden hour" className="w-full h-full object-cover opacity-20" />
         </div>
@@ -306,14 +306,16 @@ export function AuthPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-foreground mb-1.5">County</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Nairobi, Nakuru, Kisumu"
+                <label className="block text-sm font-bold text-foreground mb-1.5">County *</label>
+                <select
                   value={county}
                   onChange={e => setCounty(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none"
-                />
+                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none cursor-pointer"
+                >
+                  {KENYAN_COUNTIES.map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

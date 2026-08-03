@@ -4,22 +4,15 @@ import type { AIProvider, AIContext, ChatResponse, ProviderInfo } from "@/servic
 
 export const mockProviders: ProviderInfo[] = [
   {
-    id: "gemini",
-    name: "Google Gemini",
-    model: "gemini-2.0-flash",
+    id: "auto",
+    name: "AgriNexus AI Engine",
+    model: "agrinexus-v2-smart",
     available: true,
-    description: "Fast, versatile AI by Google — great for weather analysis and general farming advice",
-    color: "#4285F4",
-  },
-  {
-    id: "deepseek",
-    name: "DeepSeek",
-    model: "deepseek-chat",
-    available: true,
-    description: "Advanced reasoning AI — excellent for market analysis and complex farming decisions",
-    color: "#7C3AED",
+    description: "AgriNexus Intelligent AI engine for weather, crop, and market advisories",
+    color: "#10B981",
   },
 ];
+
 
 // ── Mock Chat Responses ───────────────────────────────────────────────────────
 
@@ -110,16 +103,15 @@ Is there something specific about your farm you'd like me to look into? I can an
 };
 
 export function mockChatResponse(
-  provider: AIProvider,
-  context: AIContext,
-  message: string
+  provider: AIProvider = "auto",
+  context: AIContext = "general",
+  message: string = ""
 ): ChatResponse {
   const pool = chatResponses[context] ?? chatResponses.general;
-  // Simple deterministic pick based on message
   const idx = Math.abs(message.split("").reduce((a, c) => a + c.charCodeAt(0), 0)) % pool.length;
   return {
     response: pool[idx],
-    provider: `${provider} (mock)`,
+    provider: "AgriNexus AI Engine",
     tokens_used: undefined,
     context,
     timestamp: new Date().toISOString(),
@@ -147,7 +139,7 @@ The coming week looks favourable for farming activities in ${county} county. Tem
 4. 📦 Schedule harvest for Saturday morning when conditions are driest
 
 **Confidence Level:** 82% — based on current atmospheric patterns and historical data for ${county}.`,
-    provider: "gemini (mock)",
+    provider: "AgriNexus AI Engine",
     county,
     crop: crop || "",
     generated_at: new Date().toISOString(),
@@ -180,7 +172,7 @@ ${crop ? `**${crop} Specific Analysis:**
 - Grade and sort produce — premium quality commands 30-40% higher prices
 
 **Market Confidence:** High — demand fundamentals are strong heading into the season.`,
-    provider: "deepseek (mock)",
+    provider: "AgriNexus AI Engine",
     county,
     crop: crop || "",
     generated_at: new Date().toISOString(),

@@ -12,7 +12,7 @@ interface Props {
 export function WeatherPredictionCard({ county = "Kiambu", crop = "" }: Props) {
   const [prediction, setPrediction] = useState<WeatherPrediction | null>(null);
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchPrediction = async () => {

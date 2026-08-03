@@ -1,0 +1,10 @@
+.git
+.gitignore
+.htaccess.example
+.env
+.env.*
+logs/*
+!logs/.gitkeep
+tests
+BACKEND_TEAM_GUIDE.md
+README.md
