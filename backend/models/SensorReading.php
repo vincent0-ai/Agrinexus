@@ -80,7 +80,7 @@ class SensorReading {
              WHERE farm_id = ?
                AND recorded_at >= NOW() - INTERVAL 24 HOUR
              GROUP BY DATE_FORMAT(recorded_at, '%H:00')
-             ORDER BY recorded_at ASC"
+             ORDER BY MIN(recorded_at) ASC"
         );
         $stmt->execute([$farmId]);
         return $stmt->fetchAll();
