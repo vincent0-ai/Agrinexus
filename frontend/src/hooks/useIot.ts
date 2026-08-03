@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { api } from "@/services/api";
 
 export interface SensorReading {
@@ -31,8 +31,14 @@ export function useIoT() {
   const [alerts, setAlerts]     = useState<IoTAlert[]>([]);
   const [loading, setLoading]   = useState(true);
   const [lastUpdate, setLastUpdate] = useState<string>("");
+  const [serialStatus, setSerialStatus] = useState<"disconnected" | "connected" | "error">("disconnected");
 
-  const fetchData = useCallback(async () => {
+  const portRef = useRef<any>(null);
+  const isConnectedRef = useRef(false);
+  const lastPostTimeRef = useRef(0);
+
+  // Fetch initial history/alerts from backend
+  const fetchBackendData = useCallback(async () => {
     try {
       const [latestRes, readingsRes, alertsRes] = await Promise.all([
         api.get("/iot/latest"),
@@ -40,11 +46,10 @@ export function useIoT() {
         api.get("/iot/alerts"),
       ]);
 
-      if (latestRes.success && latestRes.data) {
+      // Only update latest from backend if we are NOT connected via serial
+      if (!isConnectedRef.current && latestRes.success && latestRes.data) {
         setLatest(latestRes.data);
-        setLastUpdate(
-          new Date(latestRes.data.recorded_at).toLocaleTimeString("en-KE")
-        );
+        setLastUpdate(new Date(latestRes.data.recorded_at).toLocaleTimeString("en-KE"));
       }
       if (readingsRes.success) setHistory(readingsRes.data ?? []);
       if (alertsRes.success)   setAlerts(alertsRes.data ?? []);
@@ -55,12 +60,102 @@ export function useIoT() {
     }
   }, []);
 
+  // Poll backend every 15s (mostly for history/alerts, or for latest if no hardware connected)
   useEffect(() => {
-    fetchData();
-    // Auto-refresh every 15 seconds for live updates
-    const interval = setInterval(fetchData, 15000);
+    fetchBackendData();
+    const interval = setInterval(fetchBackendData, 15000);
     return () => clearInterval(interval);
-  }, [fetchData]);
+  }, [fetchBackendData]);
+
+  const connectHardware = async () => {
+    const nav = navigator as any;
+    if (!('serial' in nav)) {
+      alert('Web Serial is not supported on this browser. Please use Google Chrome or Edge.');
+      return;
+    }
+
+    try {
+      setSerialStatus("connected"); // optimistic
+      const port = await nav.serial.requestPort();
+      await port.open({ baudRate: 9600 });
+      portRef.current = port;
+      isConnectedRef.current = true;
+      setSerialStatus("connected");
+
+      // Read loop
+      const textDecoder = new TextDecoderStream();
+      port.readable.pipeTo(textDecoder.writable);
+      const reader = textDecoder.readable.getReader();
+
+      let buffer = '';
+      while (isConnectedRef.current) {
+        const { value, done } = await reader.read();
+        if (done) {
+          reader.releaseLock();
+          break;
+        }
+        if (value) {
+          buffer += value;
+          let lines = buffer.split('\n');
+          buffer = lines.pop() || ''; // keep unfinished chunk
+
+          for (let line of lines) {
+            if (line.trim().length > 0) {
+              try {
+                const data = JSON.parse(line.trim());
+                handleSerialData(data);
+              } catch (e) {
+                // Ignore malformed JSON chunks that can happen on startup
+              }
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Serial Connection Failed:', err);
+      setSerialStatus("error");
+      isConnectedRef.current = false;
+    }
+  };
+
+  const handleSerialData = (data: any) => {
+    // 1. Update live dashboard instantly
+    setLatest({
+      id: 0, farm_id: 0,
+      temperature: data.temp || data.temperature || 0,
+      humidity: data.humidity || 0,
+      soil_moisture: data.moisture || data.soil_moisture || 0,
+      light_level: data.light || data.light_level || 500,
+      recorded_at: new Date().toISOString()
+    });
+    setLastUpdate(new Date().toLocaleTimeString("en-KE") + " (USB Live)");
+    setLoading(false);
+
+    // 2. Throttle POST to backend (every 15 seconds)
+    const now = Date.now();
+    if (now - lastPostTimeRef.current > 15000) {
+      lastPostTimeRef.current = now;
+      api.post("/iot/ingest", {
+        temperature: data.temp || data.temperature || 0,
+        humidity: data.humidity || 0,
+        soil_moisture: data.moisture || data.soil_moisture || 0,
+        light_level: data.light || data.light_level || 500,
+      }).catch(e => console.error("Failed to ingest serial data to backend", e));
+    }
+  };
+
+  const sendHardwareCommand = async (commandString: string) => {
+    if (portRef.current && portRef.current.writable) {
+      try {
+        const encoder = new TextEncoder();
+        const writer = portRef.current.writable.getWriter();
+        await writer.write(encoder.encode(commandString + '\n'));
+        writer.releaseLock();
+      } catch (e) {
+        console.error("Failed to send command to hardware", e);
+      }
+    }
+  };
 
   // Derived metrics with status
   const metrics = latest ? [
@@ -101,6 +196,7 @@ export function useIoT() {
 
   return {
     latest, history, alerts, metrics,
-    loading, lastUpdate, refresh: fetchData
+    loading, lastUpdate, refresh: fetchBackendData,
+    serialStatus, connectHardware, sendHardwareCommand
   };
 }
