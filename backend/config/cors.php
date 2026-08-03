@@ -1,6 +1,7 @@
 <?php
 // agrinexus-api/config/cors.php
-// Allow configured origins (via ALLOWED_ORIGINS env) or common dev origins
+// Allow Vite dev server (port 5173) and production domain
+
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
