@@ -119,13 +119,19 @@ export function useIoT() {
   };
 
   const handleSerialData = (data: any) => {
+    // Debug: Log the incoming data so we can see the exact keys
+    console.log("Raw Arduino Data:", data);
+
+    // Try to guess the moisture key in case they used a different variable name
+    let parsedMoisture = data.soil_moisture ?? data.moisture ?? data.soilMoisture ?? data.soil ?? data.moisture_level ?? 0;
+
     // 1. Update live dashboard instantly
     setLatest({
       id: 0, farm_id: 0,
-      temperature: data.temp || data.temperature || 0,
-      humidity: data.humidity || 0,
-      soil_moisture: data.moisture || data.soil_moisture || 0,
-      light_level: data.light || data.light_level || 500,
+      temperature: data.temp ?? data.temperature ?? 0,
+      humidity: data.humidity ?? 0,
+      soil_moisture: parsedMoisture,
+      light_level: data.light ?? data.light_level ?? 500,
       recorded_at: new Date().toISOString()
     });
     setLastUpdate(new Date().toLocaleTimeString("en-KE") + " (USB Live)");
@@ -136,10 +142,10 @@ export function useIoT() {
     if (now - lastPostTimeRef.current > 15000) {
       lastPostTimeRef.current = now;
       api.post("/iot/ingest", {
-        temperature: data.temp || data.temperature || 0,
-        humidity: data.humidity || 0,
-        soil_moisture: data.moisture || data.soil_moisture || 0,
-        light_level: data.light || data.light_level || 500,
+        temperature: data.temp ?? data.temperature ?? 0,
+        humidity: data.humidity ?? 0,
+        soil_moisture: parsedMoisture,
+        light_level: data.light ?? data.light_level ?? 500,
       }).catch(e => console.error("Failed to ingest serial data to backend", e));
     }
   };
