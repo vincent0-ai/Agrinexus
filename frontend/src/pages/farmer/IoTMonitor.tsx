@@ -1,7 +1,7 @@
 import { Thermometer, Droplets, Activity, Sun,
   AlertTriangle, Check, RefreshCw } from "lucide-react";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
-import { useIoT } from "@/hooks/useIoT";
+import { useIoT } from "@/hooks/useIot";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/utils/cn";
 import { GREEN, AMBER } from "@/utils/constants";
