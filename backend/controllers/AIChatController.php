@@ -7,6 +7,7 @@ require_once __DIR__ . '/../services/WeatherAPIService.php';
 require_once __DIR__ . '/../services/AIMarketService.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../models/SensorReading.php';
 require_once __DIR__ . '/../utils/Response.php';
 
 class AIChatController {
@@ -117,6 +118,15 @@ class AIChatController {
         if ($user) {
             $lines[] = "User's Name: " . ($user['full_name'] ?? 'Farmer');
             $lines[] = "User's Role: " . ($user['role'] ?? 'farmer');
+
+            try {
+                $reading = SensorReading::latest($user['id']);
+                if ($reading) {
+                    $lines[] = "Current Farm Sensor Data: Temperature {$reading['temperature']}°C, Humidity {$reading['humidity']}%, Soil Moisture {$reading['soil_moisture']}%, Light {$reading['light_level']} lux.";
+                }
+            } catch (\Exception $e) {
+                // Ignore if no readings
+            }
         }
 
         try {
