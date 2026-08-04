@@ -7,7 +7,7 @@ type Page =
   | "landing" | "login"
   | "farmer-dashboard" | "buyer-dashboard"
   | "iot-monitor" | "weather" | "ai-market" | "ai-assistant"
-  | "product-listing" | "product-management" | "orders";
+  | "product-listing" | "product-management" | "orders" | "settings";
 
 interface User {
   id: number;

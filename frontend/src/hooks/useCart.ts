@@ -64,7 +64,7 @@
 
 //   return { cart, cartItems, addToCart, removeFromCart, toggleCart, inCart, placeOrder, ordering };
 // }
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "@/services/api";
 
 export interface CartItem {
@@ -77,7 +77,21 @@ export interface CartItem {
 }
 
 export function useCart() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    const saved = localStorage.getItem("agrinexus_cart");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Failed to parse cart from local storage", e);
+      }
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("agrinexus_cart", JSON.stringify(cartItems));
+  }, [cartItems]);
 
   function addToCart(product: CartItem) {
     setCartItems((prev) =>

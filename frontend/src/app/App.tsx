@@ -13,6 +13,8 @@ import { ProductManagementPage }  from "@/pages/farmer/ProductManagementPage";
 import { ProductListingPage }     from "@/pages/buyer/ProductListingPage";
 import { OrderManagementPage }    from "@/pages/buyer/OrderManagementPage";
 
+import { SettingsPage }             from "@/pages/shared/SettingsPage";
+
 // ── Router ────────────────────────────────────────────────────────────────────
 function Router() {
   const { page } = useAuth();
@@ -29,6 +31,7 @@ function Router() {
     "product-management": <ProductManagementPage />,
     "product-listing":    <ProductListingPage />,
     orders:               <OrderManagementPage />,
+    settings:             <SettingsPage />,
   };
 
   return (

@@ -45,59 +45,61 @@ export function ProductListingPage() {
 
         {/* Filter sidebar */}
         <aside className="hidden md:block w-48 flex-shrink-0">
-          <div className="bg-card rounded-2xl border border-border p-4 sticky top-0">
-            <div className="flex items-center gap-2 mb-4">
-              <Filter className="w-4 h-4 text-muted-foreground" />
-              <h3 className="font-bold text-sm text-foreground" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                Filters
-              </h3>
-            </div>
-            <div className="space-y-5">
-              <div>
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2.5">Category</p>
-                <div className="space-y-2">
-                  {CATEGORIES.map((c) => (
-                    <label key={c} className="flex items-center gap-2 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        checked={category === c}
-                        onChange={() => { setCategory(c); setPageNum(1); }}
-                        className="w-3.5 h-3.5 rounded accent-green-700"
-                      />
-                      <span className="text-sm text-foreground group-hover:text-primary transition-colors">{c}</span>
-                    </label>
-                  ))}
+          <div className="sticky top-6 space-y-4">
+            <div className="bg-card rounded-2xl border border-border p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Filter className="w-4 h-4 text-muted-foreground" />
+                <h3 className="font-bold text-sm text-foreground" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  Filters
+                </h3>
+              </div>
+              <div className="space-y-5">
+                <div>
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2.5">Category</p>
+                  <div className="space-y-2">
+                    {CATEGORIES.map((c) => (
+                      <label key={c} className="flex items-center gap-2 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={category === c}
+                          onChange={() => { setCategory(c); setPageNum(1); }}
+                          className="w-3.5 h-3.5 rounded accent-green-700"
+                        />
+                        <span className="text-sm text-foreground group-hover:text-primary transition-colors">{c}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Cart summary */}
-          {cart.length > 0 && (
-            <div className="mt-4 bg-card rounded-2xl border border-border p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <ShoppingCart className="w-4 h-4" style={{ color: GREEN }} />
-                <p className="text-sm font-bold text-foreground">
-                  {cart.length} item{cart.length > 1 ? "s" : ""} in cart
-                </p>
+            {/* Cart summary */}
+            {cart.length > 0 && (
+              <div className="bg-card rounded-2xl border border-border p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <ShoppingCart className="w-4 h-4" style={{ color: GREEN }} />
+                  <p className="text-sm font-bold text-foreground">
+                    {cart.length} item{cart.length > 1 ? "s" : ""} in cart
+                  </p>
+                </div>
+                <div className="space-y-1 mb-3">
+                  {cartItems.map((item) => (
+                    <div key={item.id} className="flex justify-between text-xs text-muted-foreground">
+                      <span className="truncate">{item.name}</span>
+                      <span className="font-semibold ml-2">KSh {item.price.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setShowOrderModal(true)}
+                  className="w-full py-2.5 rounded-xl text-white text-sm font-bold transition-opacity hover:opacity-90"
+                  style={{ background: GREEN }}
+                >
+                  Checkout →
+                </button>
               </div>
-              <div className="space-y-1 mb-3">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between text-xs text-muted-foreground">
-                    <span className="truncate">{item.name}</span>
-                    <span className="font-semibold ml-2">KSh {item.price.toLocaleString()}</span>
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={() => setShowOrderModal(true)}
-                className="w-full py-2.5 rounded-xl text-white text-sm font-bold transition-opacity hover:opacity-90"
-                style={{ background: GREEN }}
-              >
-                Checkout →
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </aside>
 
         {/* Main content */}

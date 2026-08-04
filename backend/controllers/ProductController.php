@@ -59,9 +59,15 @@ class ProductController {
             $uploadDir = __DIR__ . '/../uploads/products/';
             if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
+            $scheme = isset($_SERVER['HTTP_X_FORWARDED_PROTO']) ? $_SERVER['HTTP_X_FORWARDED_PROTO'] : (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http');
+            $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+            $scriptPath = dirname($_SERVER['SCRIPT_NAME']);
+            if ($scriptPath === '\\' || $scriptPath === '/') $scriptPath = '';
+            $baseUrl = $scheme . '://' . $host . $scriptPath;
+
             $filename = uniqid('product_') . '.' . $ext;
             move_uploaded_file($file['tmp_name'], $uploadDir . $filename);
-            $imageUrl = 'http://localhost/agrinexus/uploads/products/' . $filename;
+            $imageUrl = $baseUrl . '/uploads/products/' . $filename;
         }
 
         $product = Product::create([

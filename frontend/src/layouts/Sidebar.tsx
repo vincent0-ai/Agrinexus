@@ -55,8 +55,14 @@ export function Sidebar({ onNavigate }: SidebarProps) {
       </nav>
 
       <div className="p-3 pt-0 border-t border-white/10 space-y-0.5">
-        <button className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-white/55 hover:text-white hover:bg-white/10 transition-all">
-          <Settings className="w-4 h-4" /> Settings
+        <button 
+          onClick={() => { setPage("settings"); onNavigate?.(); }}
+          className={cn(
+            "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all",
+            page === "settings" ? "bg-white/10 text-white font-medium" : "text-white/55 hover:text-white hover:bg-white/10"
+          )}
+        >
+          <Settings className="w-4 h-4 flex-shrink-0" /> Settings
         </button>
         <button
           onClick={() => { setRole(null); setPage("landing"); onNavigate?.(); }}
