@@ -4,23 +4,98 @@ import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 import { GREEN } from "@/utils/constants";
 import { cn } from "@/utils/cn";
+import { api } from "@/services/api";
 
 type Tab = "profile" | "notifications" | "security";
 
+const COUNTIES = [
+  'Bomet', 'Bungoma', 'Busia', 'Elgeyo Marakwet', 'Embu', 'Garissa', 'Homa Bay', 
+  'Isiolo', 'Kajiado', 'Kakamega', 'Kericho', 'Kiambu', 'Kilifi', 'Kirinyaga', 
+  'Kisii', 'Kisumu', 'Kitui', 'Kwale', 'Laikipia', 'Lamu', 'Machakos', 'Makueni', 
+  'Mandera', 'Marsabit', 'Meru', 'Migori', 'Mombasa', 'Murang\'a', 'Nairobi', 
+  'Nakuru', 'Nandi', 'Narok', 'Nyamira', 'Nyandarua', 'Nyeri', 'Samburu', 'Siaya', 
+  'Taita Taveta', 'Tana River', 'Tharaka Nithi', 'Trans Nzoia', 'Turkana', 
+  'Uasin Gishu', 'Vihiga', 'Wajir', 'West Pokot'
+].sort();
+
 export function SettingsPage() {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("profile");
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSave = () => {
+  // Profile State
+  const [fullName, setFullName] = useState(user?.full_name ?? "");
+  const [email, setEmail] = useState(user?.email ?? "");
+  const [county, setCounty] = useState(user?.county ?? "");
+
+  // Password State
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleSaveProfile = async () => {
+    setLoading(true);
+    setErrorMsg("");
+    setSaved(false);
+    try {
+      const res = await api.put("/auth/me", { full_name: fullName, email, county });
+      if (res.success) {
+        setUser(res.data);
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        setErrorMsg(res.message || "Failed to update profile");
+      }
+    } catch (e: any) {
+      setErrorMsg(e.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSavePassword = async () => {
+    if (newPassword !== confirmPassword) {
+      setErrorMsg("New passwords do not match");
+      return;
+    }
+    setLoading(true);
+    setErrorMsg("");
+    setSaved(false);
+    try {
+      const res = await api.put("/auth/password", { current_password: currentPassword, new_password: newPassword });
+      if (res.success) {
+        setSaved(true);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        setErrorMsg(res.message || "Failed to update password");
+      }
+    } catch (e: any) {
+      setErrorMsg(e.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveNotifications = () => {
     setLoading(true);
     setSaved(false);
     setTimeout(() => {
       setLoading(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    }, 800);
+    }, 500);
+  };
+
+  const handleSave = () => {
+    if (activeTab === "profile") handleSaveProfile();
+    else if (activeTab === "password") handleSavePassword();
+    else if (activeTab === "security") handleSavePassword();
+    else handleSaveNotifications();
   };
 
   return (
@@ -30,7 +105,7 @@ export function SettingsPage() {
         {/* Navigation Tabs */}
         <div className="flex border-b border-border overflow-x-auto [scrollbar-width:none]">
           <button 
-            onClick={() => setActiveTab("profile")}
+            onClick={() => { setActiveTab("profile"); setErrorMsg(""); }}
             className={cn("px-4 py-3 text-sm font-bold whitespace-nowrap transition-colors", activeTab === "profile" ? "text-primary border-b-2" : "text-muted-foreground hover:text-foreground")}
             style={activeTab === "profile" ? { borderColor: GREEN, color: GREEN } : {}}
           >
@@ -38,7 +113,7 @@ export function SettingsPage() {
             Profile Details
           </button>
           <button 
-            onClick={() => setActiveTab("notifications")}
+            onClick={() => { setActiveTab("notifications"); setErrorMsg(""); }}
             className={cn("px-4 py-3 text-sm font-bold whitespace-nowrap transition-colors", activeTab === "notifications" ? "text-primary border-b-2" : "text-muted-foreground hover:text-foreground")}
             style={activeTab === "notifications" ? { borderColor: GREEN, color: GREEN } : {}}
           >
@@ -46,7 +121,7 @@ export function SettingsPage() {
             Notifications
           </button>
           <button 
-            onClick={() => setActiveTab("security")}
+            onClick={() => { setActiveTab("security"); setErrorMsg(""); }}
             className={cn("px-4 py-3 text-sm font-bold whitespace-nowrap transition-colors", activeTab === "security" ? "text-primary border-b-2" : "text-muted-foreground hover:text-foreground")}
             style={activeTab === "security" ? { borderColor: GREEN, color: GREEN } : {}}
           >
@@ -68,17 +143,22 @@ export function SettingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-foreground">Full Name</label>
-                  <input type="text" defaultValue={user?.full_name} className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all" />
+                  <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all" />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-foreground">Email Address</label>
-                  <input type="email" defaultValue={user?.email} className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all" />
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all" />
                 </div>
                 <div className="space-y-1.5 md:col-span-2">
                   <label className="text-sm font-bold text-foreground">Location / County</label>
                   <div className="relative">
-                    <Globe className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="text" defaultValue={user?.county} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all" />
+                    <Globe className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                    <select value={county} onChange={e => setCounty(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all appearance-none">
+                      <option value="" disabled>Select a county</option>
+                      {COUNTIES.map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
@@ -123,22 +203,27 @@ export function SettingsPage() {
               <div className="space-y-4 max-w-md">
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-foreground">Current Password</label>
-                  <input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all" />
+                  <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all" />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-foreground">New Password</label>
-                  <input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all" />
+                  <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all" />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-foreground">Confirm New Password</label>
-                  <input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all" />
+                  <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600 transition-all" />
                 </div>
               </div>
             </div>
           )}
 
           {/* Action Footer */}
-          <div className="mt-8 pt-6 border-t border-border flex items-center justify-end gap-3">
+          <div className="mt-8 pt-6 border-t border-border flex items-center justify-end gap-4">
+            {errorMsg && (
+              <span className="text-sm font-medium text-red-500 flex-1">
+                {errorMsg}
+              </span>
+            )}
             {saved && (
               <span className="text-sm font-medium text-emerald-600 animate-in fade-in">
                 Settings saved successfully!

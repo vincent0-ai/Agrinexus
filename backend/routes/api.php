@@ -18,10 +18,12 @@ function dispatch(string $method, string $path): void {
     $path = preg_replace('#^api/?#', '', $path);
 
     // Auth routes
-    if ($method === 'POST'  && $path === 'auth/register')       { AuthController::register(); return; }
-    if ($method === 'POST'  && $path === 'auth/login')          { AuthController::login();    return; }
-    if ($method === 'POST'  && $path === 'auth/logout')         { AuthController::logout();   return; }
-    if ($method === 'GET'   && $path === 'auth/me')             { AuthController::me();       return; }
+    if ($method === 'POST' && $path === 'auth/register') { AuthController::register(); return; }
+    if ($method === 'POST' && $path === 'auth/login')    { AuthController::login();    return; }
+    if ($method === 'POST' && $path === 'auth/logout')   { AuthController::logout();   return; }
+    if ($method === 'GET'  && $path === 'auth/me')       { AuthController::me();       return; }
+    if ($method === 'PUT'  && $path === 'auth/me')       { AuthController::updateProfile(); return; }
+    if ($method === 'PUT'  && $path === 'auth/password') { AuthController::updatePassword(); return; }
 
     // Product routes
     if ($method === 'GET'   && $path === 'products')            { ProductController::index();  return; }

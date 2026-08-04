@@ -27,6 +27,26 @@ class User {
         return self::find((int) $db->lastInsertId());
     }
 
+    public static function update(int $id, array $data): array {
+        $db = getDB();
+        $sql = "UPDATE users SET full_name = :full_name, email = :email, county = :county, updated_at = NOW() WHERE id = :id";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([
+            'full_name' => $data['full_name'],
+            'email'     => $data['email'],
+            'county'    => $data['county'] ?? '',
+            'id'        => $id
+        ]);
+        return self::find($id);
+    }
+
+    public static function updatePassword(int $id, string $passwordHash): void {
+        $db = getDB();
+        $sql = "UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$passwordHash, $id]);
+    }
+
     public static function toPublic(array $user): array {
         unset($user['password_hash']);
         return $user;

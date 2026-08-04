@@ -59,4 +59,49 @@ class AuthController {
         if (!$user) Response::error('User not found', 404);
         Response::success(User::toPublic($user));
     }
+
+    public static function updateProfile(): void {
+        require_once __DIR__ . '/../middleware/AuthMiddleware.php';
+        $payload = AuthMiddleware::handle();
+        $user    = User::find($payload['user_id']);
+        if (!$user) Response::error('User not found', 404);
+
+        $body = json_decode(file_get_contents('php://input'), true) ?? [];
+        $v = (new Validator($body))->required('full_name')->required('email')->email('email');
+        if ($v->fails()) Response::error(implode(', ', $v->errors()));
+
+        // Check email uniqueness if changed
+        if ($body['email'] !== $user['email']) {
+            $existing = User::findByEmail($body['email']);
+            if ($existing) Response::error('Email is already in use', 409);
+        }
+
+        $updatedUser = User::update($user['id'], [
+            'full_name' => $body['full_name'],
+            'email'     => $body['email'],
+            'county'    => $body['county'] ?? $user['county']
+        ]);
+
+        Response::success(User::toPublic($updatedUser), 'Profile updated');
+    }
+
+    public static function updatePassword(): void {
+        require_once __DIR__ . '/../middleware/AuthMiddleware.php';
+        $payload = AuthMiddleware::handle();
+        $user    = User::find($payload['user_id']);
+        if (!$user) Response::error('User not found', 404);
+
+        $body = json_decode(file_get_contents('php://input'), true) ?? [];
+        $v = (new Validator($body))->required('current_password')->required('new_password')->min('new_password', 8);
+        if ($v->fails()) Response::error(implode(', ', $v->errors()));
+
+        if (!password_verify($body['current_password'], $user['password_hash'])) {
+            Response::error('Incorrect current password', 401);
+        }
+
+        $hash = password_hash($body['new_password'], PASSWORD_BCRYPT);
+        User::updatePassword($user['id'], $hash);
+
+        Response::success(null, 'Password updated successfully');
+    }
 }
