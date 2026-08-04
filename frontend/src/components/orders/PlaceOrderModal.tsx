@@ -52,10 +52,10 @@ export function PlaceOrderModal({ cartItems, onClose, onSuccess, updateQuantity 
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-card rounded-2xl border border-border w-full max-w-md shadow-2xl">
+      <div className="bg-card rounded-2xl border border-border w-full max-w-md shadow-2xl max-h-[90vh] flex flex-col">
 
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
+        <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
           <div className="flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" style={{ color: GREEN }} />
             <h2 className="font-black text-lg text-foreground" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -67,7 +67,7 @@ export function PlaceOrderModal({ cartItems, onClose, onSuccess, updateQuantity 
           </button>
         </div>
 
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
 
           {/* Items with quantity controls */}
           <div>
