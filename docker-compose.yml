@@ -23,9 +23,9 @@ services:
 
   # PHP Backend API Service
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    # Built and pushed by .github/workflows/deploy.yml.
+    image: ghcr.io/vincent0-ai/agrinexus-backend:latest
+    pull_policy: always
     container_name: agrinexus_backend
     restart: always
     environment:
@@ -47,11 +47,10 @@ services:
 
   # React / Vite Frontend Service
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    # VITE_API_BASE_URL is baked into the bundle by CI (repository variable),
+    # not at deploy time.
+    image: ghcr.io/vincent0-ai/agrinexus-frontend:latest
+    pull_policy: always
     container_name: agrinexus_frontend
     restart: always
     expose:
